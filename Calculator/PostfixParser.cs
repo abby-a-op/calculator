@@ -32,12 +32,12 @@ public class PostfixParser
 
             while (NumberStack.Count >= 2 && OperatorStack.Count >= 1)
             {
-                int a = NumberStack.Pop();
-                int b = NumberStack.Pop();
+                int rhs = NumberStack.Pop();
+                int lhs = NumberStack.Pop();
 
                 Operator op = OperatorStack.Pop();
 
-                int c = ApplyOperation(a, b, op);
+                int c = ApplyOperation(lhs, rhs, op);
 
                 NumberStack.Push(c);
             }
@@ -50,9 +50,9 @@ public class PostfixParser
         return op switch
         {
             Operator.Plus => a+b,
-            Operator.Minus => b-a,
+            Operator.Minus => a-b,
             Operator.Multiply => a*b,
-            Operator.Divide => b/a,
+            Operator.Divide => a/b,
             Operator.Exponentiate => (int)Math.Pow(b,a),
             _ => -1
         };
