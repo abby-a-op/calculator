@@ -9,6 +9,11 @@ public class PostfixParser
 
     public string[] Expression { get; set; }
 
+    public PostfixParser()
+    {
+        Expression = [];
+    }
+
     public PostfixParser(string[] expression)
     {
         this.Expression = expression;
@@ -47,6 +52,11 @@ public class PostfixParser
 
     private int ApplyOperation(int a, int b, Operator op)
     {
+        if (op == Operator.Divide && a == 0)
+        {
+            throw new DivideByZeroException();
+        }
+
         return op switch
         {
             Operator.Plus => a+b,
