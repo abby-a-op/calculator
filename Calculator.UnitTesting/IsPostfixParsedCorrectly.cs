@@ -21,7 +21,24 @@ public class IsPostFixParsedCorrectly
     [DataRow(new object[] { 100, 1002, 1102 })]
     public void IsAdditionCorrect(int a, int b, int expectedResult)
     {
-        _Parser.Expression = new string[] { a.ToString(), b.ToString(), "+" };
+        _Parser.Expression = new Token[]
+        {
+            new Token()
+            {
+                Value = a.ToString(),
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = b.ToString(),
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = "+",
+                Type = TokenType.Operator
+            }
+        };
         int result = _Parser.Evaluate();
 
         Assert.AreEqual(expectedResult, result);
@@ -34,7 +51,24 @@ public class IsPostFixParsedCorrectly
     [DataRow(new object[] { 3, 2, 6 })]
     public void IsMultiplicationCorrect(int a, int b, int expectedResult)
     {
-        _Parser.Expression = new string[] { a.ToString(), b.ToString(), "*" };
+        _Parser.Expression = new Token[]
+        {
+            new Token()
+            {
+                Value = a.ToString(),
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = b.ToString(),
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = "*",
+                Type = TokenType.Operator
+            }
+        };
         int result = _Parser.Evaluate();
 
         Assert.AreEqual(expectedResult, result);
@@ -47,7 +81,24 @@ public class IsPostFixParsedCorrectly
     public void DivisionByZeroHandled(int a)
     {
         bool errorThrown, errorIsDivisionByZero = true;
-        _Parser.Expression = new string[] { a.ToString(), "0", "/" };
+        _Parser.Expression = new Token[]
+        {
+            new Token()
+            {
+                Value = a.ToString(),
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = "0",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "/",
+                Type = TokenType.Operator
+            }
+        };
         try
         {
             _Parser.Evaluate();
