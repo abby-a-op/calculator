@@ -72,7 +72,7 @@ public class PostfixParser
             Operator.Minus => a-b,
             Operator.Multiply => a*b,
             Operator.Divide => a/b,
-            Operator.Exponentiate => Math.Pow(b, a),
+            Operator.Exponentiate => Math.Pow(a, b),
             Operator.Modulo => a%b,
             _ => -1
         };
