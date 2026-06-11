@@ -8,7 +8,7 @@ public class Program
 
         while (true)
         {
-            string input = Console.ReadLine();
+            string input = Console.ReadLine() ?? "";
             evaluator.Expression = input;
 
             Console.WriteLine(evaluator.Evaluate());

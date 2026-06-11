@@ -7,7 +7,8 @@ public static class Functions
         return name switch
         {
             "sqrt" => Sqrt(n),
-            "!" => Factorial(n)
+            "!" => Factorial(n),
+            _ => -1
         };
     }
 

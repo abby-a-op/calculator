@@ -7,7 +7,7 @@ public class PostfixParser
 {
     private const string OPERATORS = "+-*/^";
 
-    public Token[] Expression;
+    public Token[] Expression = new Token[0];
 
     public int Evaluate()
     {
