@@ -26,12 +26,12 @@ public class IsPostFixParsedCorrectly
             new Token()
             {
                 Value = a.ToString(),
-                Type = TokenType.Number
+                Type = TokenType.Integer
             },
             new Token()
             {
                 Value = b.ToString(),
-                Type = TokenType.Number
+                Type = TokenType.Integer
             },
             new Token()
             {
@@ -56,12 +56,12 @@ public class IsPostFixParsedCorrectly
             new Token()
             {
                 Value = a.ToString(),
-                Type = TokenType.Number
+                Type = TokenType.Integer
             },
             new Token()
             {
                 Value = b.ToString(),
-                Type = TokenType.Number
+                Type = TokenType.Integer
             },
             new Token()
             {
