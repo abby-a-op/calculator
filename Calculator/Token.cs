@@ -11,5 +11,6 @@ public enum TokenType
     Invalid = -1,
     Number,
     Operator,
-    Function
+    Function,
+    Real
 }
