@@ -9,8 +9,7 @@ public struct Token
 public enum TokenType
 {
     Invalid = -1,
-    Integer,
+    Number,
     Operator,
     Function,
-    Real
 }

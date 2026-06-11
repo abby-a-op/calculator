@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 
 namespace Calculator;
@@ -9,16 +10,16 @@ public class PostfixParser
 
     public Token[] Expression = new Token[0];
 
-    public int Evaluate()
+    public double Evaluate()
     {
-        Stack<int> NumberStack = new Stack<int>();
+        Stack<double> NumberStack = new Stack<double>();
         Stack<Token> OperatorStack = new Stack<Token>();
 
         foreach (Token token in Expression)
         {
-            if (token.Type == TokenType.Integer)
+            if (token.Type == TokenType.Number)
             {
-                NumberStack.Push(int.Parse(token.Value));
+                NumberStack.Push(double.Parse(token.Value));
             }
             else
             {
@@ -36,9 +37,9 @@ public class PostfixParser
 
                 if (popped.Type == TokenType.Function)
                 {
-                    int n = NumberStack.Pop();
+                    double n = NumberStack.Pop();
 
-                    int result = Functions.EvaluateFunction(popped.Value, n);
+                    double result = Functions.EvaluateFunction(popped.Value, n);
 
                     NumberStack.Push(result);
                 }
@@ -46,10 +47,10 @@ public class PostfixParser
                 {
                     Operator op = (Operator)popped.Value[0];
 
-                    int rhs = NumberStack.Pop();
-                    int lhs = NumberStack.Pop();
+                    double rhs = NumberStack.Pop();
+                    double lhs = NumberStack.Pop();
 
-                    int result = ApplyOperation(lhs, rhs, op);
+                    double result = ApplyOperation(lhs, rhs, op);
 
                     NumberStack.Push(result);
                 }
@@ -58,7 +59,7 @@ public class PostfixParser
         return NumberStack.Pop();
     }
 
-    private int ApplyOperation(int a, int b, Operator op)
+    private double ApplyOperation(double a, double b, Operator op)
     {
         if (op == Operator.Divide && b == 0)
         {
@@ -71,7 +72,7 @@ public class PostfixParser
             Operator.Minus => a-b,
             Operator.Multiply => a*b,
             Operator.Divide => a/b,
-            Operator.Exponentiate => (int)Math.Pow(b,a),
+            Operator.Exponentiate => Math.Pow(b, a),
             Operator.Modulo => a%b,
             _ => -1
         };

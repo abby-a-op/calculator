@@ -41,12 +41,12 @@ public class IsInfixParsedCorrectly
             new Token()
             {
                 Value="2",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
                 Value="3",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
@@ -70,12 +70,12 @@ public class IsInfixParsedCorrectly
             new Token()
             {
                 Value="0",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
                 Value="2",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
@@ -99,17 +99,17 @@ public class IsInfixParsedCorrectly
             new Token()
             {
                 Value="2",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
                 Value="4",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
                 Value="3",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
@@ -138,17 +138,17 @@ public class IsInfixParsedCorrectly
             new Token()
             {
                 Value="2",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
                 Value="4",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
                 Value="3",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
@@ -163,7 +163,7 @@ public class IsInfixParsedCorrectly
             new Token()
             {
                 Value = "2",
-                Type=TokenType.Integer
+                Type=TokenType.Number
             },
             new Token()
             {
@@ -187,12 +187,12 @@ public class IsInfixParsedCorrectly
             new Token()
             {
                 Value = "3",
-                Type = TokenType.Integer
+                Type = TokenType.Number
             },
             new Token()
             {
                 Value = "2",
-                Type = TokenType.Integer
+                Type = TokenType.Number
             },
             new Token()
             {

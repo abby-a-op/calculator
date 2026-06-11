@@ -7,7 +7,7 @@ public class InfixEvaluator
 
     public string Expression = "";
 
-    public int Evaluate()
+    public double Evaluate()
     {
         _infixParser.Expression = Expression;
         _postfixParser.Expression = _infixParser.Parse();
