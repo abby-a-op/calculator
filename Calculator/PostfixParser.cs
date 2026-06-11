@@ -16,7 +16,7 @@ public class PostfixParser
 
         foreach (Token token in Expression)
         {
-            if (token.Type == TokenType.Number)
+            if (token.Type == TokenType.Integer)
             {
                 NumberStack.Push(int.Parse(token.Value));
             }

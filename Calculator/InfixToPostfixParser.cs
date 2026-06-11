@@ -13,7 +13,7 @@ public class InfixToPostfixParser
         { "!", 3 }
     };
 
-    const string DIGITS = "0123456789.";
+    const string DIGITS = "0123456789";
     const string OPERATORS = "+-/*()^%";
 
     public string Expression = "";
@@ -37,15 +37,24 @@ public class InfixToPostfixParser
 
             if (DIGITS.Contains(c))
             {
-                currentCharTokenType = TokenType.Number;
+                currentCharTokenType = TokenType.Integer;
             }
             else if (OPERATORS.Contains(c))
             {
                 currentCharTokenType = TokenType.Operator;
             }
+            else if (c == '.')
+            {
+                currentCharTokenType = TokenType.Real;
+            }
             else
             {
                 currentCharTokenType = TokenType.Function;
+            }
+
+            if (currentCharTokenType == TokenType.Real && currentToken.Type == TokenType.Integer)
+            {
+                currentToken.Type = TokenType.Real;
             }
 
             if (i == 0)
@@ -72,7 +81,7 @@ public class InfixToPostfixParser
 
         Token zero = new Token()
         {
-            Type = TokenType.Number,
+            Type = TokenType.Integer,
             Value = "0"
         };
 
@@ -83,7 +92,7 @@ public class InfixToPostfixParser
 
         for (int i = 0; i < tokens.Count-1; i++)
         {
-            if (tokens[i].Type == TokenType.Number || tokens[i].Value == ")")
+            if (tokens[i].Type == TokenType.Integer || tokens[i].Value == ")")
             {
                 if (tokens[i + 1].Type == TokenType.Function || tokens[i+1].Value == "(")
                 {
@@ -117,7 +126,7 @@ public class InfixToPostfixParser
         foreach (Token token in Tokenise())
         {
             // Numbers are added directly to the expression
-            if (token.Type == TokenType.Number)
+            if (token.Type == TokenType.Integer)
             {
                 postfix.Add(token);
                 continue;
