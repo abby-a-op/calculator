@@ -7,44 +7,52 @@ public class PostfixParser
 {
     private const string OPERATORS = "+-*/^";
 
-    public string[] Expression { get; set; }
-
-    public PostfixParser()
-    {
-        Expression = [];
-    }
-
-    public PostfixParser(string[] expression)
-    {
-        this.Expression = expression;
-    }
+    public Token[] Expression;
 
     public int Evaluate()
     {
         Stack<int> NumberStack = new Stack<int>();
-        Stack<Operator> OperatorStack = new Stack<Operator>();
+        Stack<Token> OperatorStack = new Stack<Token>();
 
-        foreach (string token in Expression)
+        foreach (Token token in Expression)
         {
-            if (OPERATORS.Contains(token))
+            if (token.Type == TokenType.Number)
             {
-                OperatorStack.Push((Operator)token[0]);
+                NumberStack.Push(int.Parse(token.Value));
             }
             else
             {
-                NumberStack.Push(int.Parse(token));
+                OperatorStack.Push(token);
             }
-
-            while (NumberStack.Count >= 2 && OperatorStack.Count >= 1)
+            
+            while (
+                OperatorStack.TryPeek(out Token top) && (
+                    top.Type == TokenType.Function && NumberStack.Count >= 1
+                    || top.Type == TokenType.Operator && NumberStack.Count >= 2
+                    )
+                )
             {
-                int rhs = NumberStack.Pop();
-                int lhs = NumberStack.Pop();
+                Token popped = OperatorStack.Pop();
 
-                Operator op = OperatorStack.Pop();
+                if (popped.Type == TokenType.Function)
+                {
+                    int n = NumberStack.Pop();
 
-                int c = ApplyOperation(lhs, rhs, op);
+                    int result = Functions.EvaluateFunction(popped.Value, n);
 
-                NumberStack.Push(c);
+                    NumberStack.Push(result);
+                }
+                else if (popped.Type == TokenType.Operator)
+                {
+                    Operator op = (Operator)popped.Value[0];
+
+                    int rhs = NumberStack.Pop();
+                    int lhs = NumberStack.Pop();
+
+                    int result = ApplyOperation(lhs, rhs, op);
+
+                    NumberStack.Push(result);
+                }
             }
         }
         return NumberStack.Pop();
@@ -64,6 +72,7 @@ public class PostfixParser
             Operator.Multiply => a*b,
             Operator.Divide => a/b,
             Operator.Exponentiate => (int)Math.Pow(b,a),
+            Operator.Modulo => a%b,
             _ => -1
         };
     }
@@ -75,5 +84,6 @@ public enum Operator
     Minus = '-',
     Multiply = '*',
     Divide = '/',
-    Exponentiate = '^'
+    Exponentiate = '^',
+    Modulo = '%'
 }
