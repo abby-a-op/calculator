@@ -60,7 +60,7 @@ public class PostfixParser
 
     private int ApplyOperation(int a, int b, Operator op)
     {
-        if (op == Operator.Divide && a == 0)
+        if (op == Operator.Divide && b == 0)
         {
             throw new DivideByZeroException();
         }

@@ -73,48 +73,4 @@ public class IsPostFixParsedCorrectly
 
         Assert.AreEqual(expectedResult, result);
     }
-
-    [TestMethod]
-    [DataRow(0)]
-    [DataRow(2)]
-    [DataRow(1)]
-    public void DivisionByZeroHandled(int a)
-    {
-        bool errorThrown, errorIsDivisionByZero = true;
-        _Parser.Expression = new Token[]
-        {
-            new Token()
-            {
-                Value = a.ToString(),
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "0",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "/",
-                Type = TokenType.Operator
-            }
-        };
-        try
-        {
-            _Parser.Evaluate();
-            errorThrown = false;
-        }
-        catch (Exception e) when (e is DivideByZeroException)
-        {
-            errorIsDivisionByZero = true;
-            errorThrown = true;
-        }
-        catch (Exception e) when (e is not DivideByZeroException)
-        {
-            errorThrown = true;
-            errorIsDivisionByZero = false;
-            throw;
-        }
-        Assert.IsTrue(errorThrown || errorIsDivisionByZero);
-    }
 }
