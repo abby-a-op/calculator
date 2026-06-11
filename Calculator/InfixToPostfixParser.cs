@@ -2,12 +2,6 @@ namespace Calculator;
 
 public class InfixToPostfixParser
 {
-    public static readonly string[] Functions = new string[]
-    {
-        "sqrt",
-        "sin"
-    };
-
     static Dictionary<string, int> OperatorPrecedence = new Dictionary<string, int>()
     {
         { "+", 1 },
@@ -20,7 +14,7 @@ public class InfixToPostfixParser
     };
 
     const string DIGITS = "0123456789.";
-    const string OPERATORS = "+-/*()^%!";
+    const string OPERATORS = "+-/*()^%";
 
     public string Expression = "";
 
@@ -117,28 +111,35 @@ public class InfixToPostfixParser
     {
         Stack<Token> operatorStack = new Stack<Token>();
 
+        // The parsed postfix expression
         List<Token> postfix = new List<Token>();
 
         foreach (Token token in Tokenise())
         {
+            // Numbers are added directly to the expression
             if (token.Type == TokenType.Number)
             {
                 postfix.Add(token);
                 continue;
             }
 
+            if (token.Value == "!")
+            {
+                postfix.Add(token);
+                continue;
+            }
+
+            // Functions are added to the stack, and are printed when the following opening bracket is closed
             if (token.Type == TokenType.Function)
             {
                 operatorStack.Push(token);
+                continue;
             }
 
             if (token.Type == TokenType.Operator)
             {
                 switch (token.Value)
                 {
-                    case "!":
-                        postfix.Add(token);
-                        break;
                     case "(":
                         operatorStack.Push(token);
                         break;
@@ -151,7 +152,7 @@ public class InfixToPostfixParser
                             operatorStack.Push(token);
                             break;
                         }
-                        
+
                         Token topOperator = operatorStack.Peek();
 
                         if (topOperator.Value == "(")
