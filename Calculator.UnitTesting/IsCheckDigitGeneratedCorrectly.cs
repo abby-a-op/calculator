@@ -5,17 +5,17 @@ public class IsCheckDigitGeneratedCorrectly
 {
     [TestMethod]
     // Sample UPC barcodes
-    [DataRow("71234567890", 4)]
-    [DataRow("01234567890", 5)]
+    [DataRow("71234567890", "712345678904")]
+    [DataRow("01234567890", "012345678905")]
     // Sample ISBNs
-    [DataRow("043902348", 3)]
-    [DataRow("030640615", 2)]
+    [DataRow("043902348", "0439023483")]
+    [DataRow("030640615", "0306406152")]
     // Sample EAN-13
-    [DataRow("501234567890", 0)]
-    public void IsDigitGeneratedCorrectly(string digits, int expectedDigit)
+    [DataRow("501234567890", "5012345678900")]
+    public void IsDigitGeneratedCorrectly(string digits, string expectedString)
     {
-        int actualDigit = NumberTheory.NumCheckDigit(digits);
+        string actualString = NumberTheory.NumCheckDigit(digits);
 
-        Assert.AreEqual(expectedDigit, actualDigit);
+        Assert.AreEqual(expectedString, actualString);
     }
 }

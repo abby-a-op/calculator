@@ -1,3 +1,5 @@
+using System.Runtime.Serialization;
+
 namespace Calculator;
 
 public static class NumberTheory
@@ -31,8 +33,9 @@ public static class NumberTheory
         return true;
     }
 
-    public static int NumCheckDigit(string digits)
+    public static string NumCheckDigit(string digits)
     {
+        int result = -1;
         // UPC
         if (digits.Length == 11)
         {
@@ -45,10 +48,8 @@ public static class NumberTheory
                 sum += digit * (i % 2 == 0 ? 3 : 1);
             }
 
-            int result = (-sum) % 10;
+            result = (-sum) % 10;
             if (result < 0) result += 10;
-
-            return result;
         }
 
         // ISBN
@@ -63,10 +64,8 @@ public static class NumberTheory
                 sum += digit * (i+1);
             }
 
-            int result = sum % 11;
+            result = sum % 11;
             if (result < 0) result += 11;
-
-            return result;
         }
 
         // EAN-13
@@ -81,12 +80,10 @@ public static class NumberTheory
                 sum += digit * (i % 2 == 0 ? 3 : 1);
             }
 
-            int result = (-sum) % 10;
+            result = (-sum) % 10;
             if (result < 0) result += 10;
-
-            return result;
         }
 
-        return -1;
+        return digits + result.ToString();
     }
 }
