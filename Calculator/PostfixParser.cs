@@ -66,6 +66,11 @@ public class PostfixParser
             throw new DivideByZeroException();
         }
 
+        if (op == Operator.Exponentiate && a == 0 && b == 0)
+        {
+            throw new ArithmeticException();
+        }
+
         return op switch
         {
             Operator.Plus => a+b,
