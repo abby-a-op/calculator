@@ -39,7 +39,7 @@ public class IsPostFixParsedCorrectly
                 Type = TokenType.Operator
             }
         };
-        int result = _Parser.Evaluate();
+        double result = _Parser.Evaluate();
 
         Assert.AreEqual(expectedResult, result);
     }
@@ -69,7 +69,35 @@ public class IsPostFixParsedCorrectly
                 Type = TokenType.Operator
             }
         };
-        int result = _Parser.Evaluate();
+        double result = _Parser.Evaluate();
+
+        Assert.AreEqual(expectedResult, result);
+    }
+
+    [TestMethod]
+    [DataRow([2, 3, 8])]
+    [DataRow([10, 4, 10000])]
+    public void IsExponentiationCorrect(int a, int b, int expectedResult)
+    {
+        _Parser.Expression = new Token[]
+        {
+            new Token()
+            {
+                Value = a.ToString(),
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = b.ToString(),
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = "^",
+                Type = TokenType.Operator
+            }
+        };
+        double result = _Parser.Evaluate();
 
         Assert.AreEqual(expectedResult, result);
     }
