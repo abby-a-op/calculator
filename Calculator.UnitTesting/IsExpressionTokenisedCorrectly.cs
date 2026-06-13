@@ -3,11 +3,11 @@ namespace Calculator.UnitTesting;
 [TestClass]
 public class IsExpressionTokenisedCorrectly
 {
-    InfixToPostfixParser _parser;
+    Interpreter _interpreter;
 
     public IsExpressionTokenisedCorrectly()
     {
-        _parser = new InfixToPostfixParser();
+        _interpreter = new Interpreter();
     }
 
     bool TokensEqual(Token[] expected, Token[] actual)
@@ -31,7 +31,7 @@ public class IsExpressionTokenisedCorrectly
     [TestMethod]
     public void AreAllOperatorsTokenisedCorrectly()
     {
-        _parser.Expression = "2+3-3*2%2!^2*2*(2-3)";
+        _interpreter.Command = "2+3-3*2%2!^2*2*(2-3)";
 
         Token[] expected = new Token[]
         {
@@ -137,13 +137,13 @@ public class IsExpressionTokenisedCorrectly
             }
         };
 
-        Assert.IsTrue(TokensEqual(expected, _parser.Tokenise()));
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
     }
 
     [TestMethod]
     public void IsUnaryMinusTokenisedCorrectly()
     {
-        _parser.Expression = "-2";
+        _interpreter.Command = "-2";
 
         Token[] expected = new Token[]
         {
@@ -164,13 +164,13 @@ public class IsExpressionTokenisedCorrectly
             }
         };
 
-        Assert.IsTrue(TokensEqual(expected, _parser.Tokenise()));
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
     }
 
     [TestMethod]
     public void IsJuxtapositionTokenisedCorrectly()
     {
-        _parser.Expression = "2(4^3)";
+        _interpreter.Command = "2(4^3)";
 
         Token[] expected = new Token[]
         {
@@ -211,13 +211,13 @@ public class IsExpressionTokenisedCorrectly
             }
         };
 
-        Assert.IsTrue(TokensEqual(expected, _parser.Tokenise()));
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
     }
 
     [TestMethod]
     public void IsAdditionAfterBracketTokenisedCorrectly()
     {
-        _parser.Expression = "2(4^3)+2";
+        _interpreter.Command = "2(4^3)+2";
 
         Token[] expected = new Token[]
         {
@@ -268,13 +268,13 @@ public class IsExpressionTokenisedCorrectly
             }
         };
 
-        Assert.IsTrue(TokensEqual(expected, _parser.Tokenise()));
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
     }
 
     [TestMethod]
     public void IsUnaryMinusInBracketsTokenisedCorrectly()
     {
-        _parser.Expression = "(-2)^2";
+        _interpreter.Command = "(-2)^2";
 
         Token[] expected = new Token[]
         {
@@ -315,6 +315,6 @@ public class IsExpressionTokenisedCorrectly
             },
         };
 
-        Assert.IsTrue(TokensEqual(expected, _parser.Tokenise()));
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
     }
 }

@@ -13,97 +13,7 @@ public class InfixToPostfixParser
         { "!", 3 }
     };
 
-    const string DIGITS = "0123456789.";
-    const string OPERATORS = "+-/*()^%";
-
-    public string Expression = "";
-
-    public Token[] Tokenise()
-    {
-        List<Token> tokens = new List<Token>();
-
-        Token currentToken = new Token();
-
-        for (int i=0; i<Expression.Length; i++)
-        {
-            char c = Expression[i];
-
-            if (c == ' ')
-            {
-                continue;
-            }
-
-            TokenType currentCharTokenType;
-
-            if (DIGITS.Contains(c))
-            {
-                currentCharTokenType = TokenType.Number;
-            }
-            else if (OPERATORS.Contains(c))
-            {
-                currentCharTokenType = TokenType.Operator;
-            }
-            else
-            {
-                currentCharTokenType = TokenType.Function;
-            }
-            if (i == 0)
-            {
-                currentToken.Type = currentCharTokenType;
-            }
-            else if (currentCharTokenType != currentToken.Type || currentCharTokenType == TokenType.Operator)
-            {
-                tokens.Add(currentToken);
-                currentToken = new Token();
-                currentToken.Type = currentCharTokenType;
-            }
-
-            currentToken.Value += c;
-        }
-
-        tokens.Add(currentToken);
-
-        Token multiplication = new Token()
-        {
-            Type = TokenType.Operator,
-            Value = "*"
-        };
-
-        Token zero = new Token()
-        {
-            Type = TokenType.Number,
-            Value = "0"
-        };
-
-        if (tokens[0].Value == "-" || tokens[0].Value == "+")
-        {
-            tokens.Insert(0, zero);
-        }
-
-        for (int i = 0; i < tokens.Count-1; i++)
-        {
-            if (tokens[i].Type == TokenType.Number || tokens[i].Value == ")")
-            {
-                if (tokens[i + 1].Type == TokenType.Function || tokens[i+1].Value == "(")
-                {
-                    tokens.Insert(i + 1, multiplication);
-                }
-            }
-        }
-
-        for (int i = 0; i < tokens.Count-1; i++)
-        {
-            if (tokens[i].Type == TokenType.Operator && tokens[i].Value != ")")
-            {
-                if (tokens[i + 1].Value == "+" || tokens[i + 1].Value == "-")
-                {
-                    tokens.Insert(i + 1, zero);
-                }
-            }
-        }
-
-        return tokens.ToArray();
-    }
+    public Token[] Expression = new Token[] { };
 
     // Implementation of Shunting Yard Algorithm (Reference: https://mathcenter.oxford.emory.edu/site/cs171/shuntingYardAlgorithm)
     public Token[] Parse()
@@ -113,7 +23,7 @@ public class InfixToPostfixParser
         // The parsed postfix expression
         List<Token> postfix = new List<Token>();
 
-        foreach (Token token in Tokenise())
+        foreach (Token token in Expression)
         {
             // Numbers are added directly to the expression
             if (token.Type == TokenType.Number)
