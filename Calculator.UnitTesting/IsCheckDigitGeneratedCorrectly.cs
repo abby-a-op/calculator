@@ -16,6 +16,6 @@ public class IsCheckDigitGeneratedCorrectly
     {
         int actualDigit = NumberTheory.NumCheckDigit(digits);
 
-        Assert.AreEqual(actualDigit, expectedDigit);
+        Assert.AreEqual(expectedDigit, actualDigit);
     }
 }
