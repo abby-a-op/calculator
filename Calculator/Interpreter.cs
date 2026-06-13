@@ -13,7 +13,10 @@ public class Interpreter
     {
         List<Token> tokens = new List<Token>();
 
-        Token currentToken = new Token();
+        Token currentToken = new Token()
+        {
+            Type = TokenType.Invalid
+        };
 
         for (int i=0; i<Command.Length; i++)
         {
@@ -21,6 +24,14 @@ public class Interpreter
 
             if (c == ' ')
             {
+                if (currentToken.Type == TokenType.Number)
+                {
+                    tokens.Add(currentToken);
+                    currentToken = new Token()
+                    {
+                        Type = TokenType.Invalid
+                    };
+                }
                 continue;
             }
 
@@ -38,16 +49,17 @@ public class Interpreter
             {
                 currentCharTokenType = TokenType.Function;
             }
-            if (i == 0)
+            if (currentToken.Type == TokenType.Invalid)
             {
                 currentToken.Type = currentCharTokenType;
             }
-            else if (currentCharTokenType != currentToken.Type || currentCharTokenType == TokenType.Operator)
+            else if (currentCharTokenType != currentToken.Type || currentCharTokenType == TokenType.Operator || currentToken.Type == TokenType.Number && c == ' ')
             {
                 tokens.Add(currentToken);
                 currentToken = new Token();
                 currentToken.Type = currentCharTokenType;
             }
+            
 
             currentToken.Value += c;
         }
@@ -98,35 +110,49 @@ public class Interpreter
 
     public string Run()
     {
-        string[] args = Command.Split(' ');
+        Token[] tokens = Tokenise();
 
-        switch (args[0])
+        if (tokens[0].Type == TokenType.Function)
         {
-            case "numRand":
+            switch (tokens[0].Value)
             {
-                int a, x, c, m;
-                a = int.Parse(args[1]);
-                x = int.Parse(args[2]);
-                c = int.Parse(args[3]);
-                m = int.Parse(args[4]);
+                case "numRand":
+                {
+                    int a, x, c, m;
 
-                return NumberTheory.NumRand(a, x, c, m).ToString();
-            }
-            case "isPrime":
-            {
-                int a = int.Parse(args[1]);
+                    a = int.Parse(tokens[1].Value);
+                    x = int.Parse(tokens[2].Value);
+                    c = int.Parse(tokens[3].Value);
+                    m = int.Parse(tokens[4].Value);
 
-                return NumberTheory.IsPrime(a).ToString();
-            }
-            case "numCheckDigit":
-            {
-                string digits = args[1];
+                    return NumberTheory.NumRand(a, x, c, m).ToString();
+                }
+                case "isPrime":
+                {
+                    int a = int.Parse(tokens[1].Value);
 
-                return NumberTheory.NumCheckDigit(digits).ToString();
+                    return NumberTheory.IsPrime(a).ToString();
+                }
+                case "numCheckDigit":
+                {
+                    string digits = tokens[1].Value;
+
+                    return NumberTheory.NumCheckDigit(digits).ToString();
+                }
+                default:
+                {
+                    return "";
+                }
             }
-            default:
-                _Evaluator.Expression = Tokenise();
-                return _Evaluator.Evaluate().ToString();
+        }
+        else if (tokens.Length == 0)
+        {
+            return "";
+        }
+        else
+        {
+            _Evaluator.Expression = tokens;
+            return _Evaluator.Evaluate().ToString();
         }
     }
 }
