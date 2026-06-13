@@ -42,10 +42,10 @@ public static class NumberTheory
             {
                 int digit = int.Parse(digits[i].ToString());
 
-                sum += digit % 2 == 0 ? 3 : 1;
+                sum += digit * (i % 2 == 0 ? 3 : 1);
             }
 
-            int result = -sum % 10;
+            int result = (-sum) % 10;
             if (result < 0) result += 10;
 
             return result;
@@ -78,10 +78,10 @@ public static class NumberTheory
             {
                 int digit = int.Parse(digits[i].ToString());
 
-                sum += digit % 2 == 0 ? 1 : 3;
+                sum += digit * (i % 2 == 0 ? 3 : 1);
             }
 
-            int result = -sum % 10;
+            int result = (-sum) % 10;
             if (result < 0) result += 10;
 
             return result;
