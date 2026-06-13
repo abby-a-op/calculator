@@ -34,7 +34,24 @@ public class IsInfixParsedCorrectly
     [TestMethod]
     public void IsMultiplicationParsedCorrectly()
     {
-        _parser.Expression = "2*3";
+        _parser.Expression = new Token[]
+        {
+            new Token()
+            {
+                Value = "2",
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = "*",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "3",
+                Type = TokenType.Number
+            }
+        };
 
         Token[] expectedOutput = new Token[]
         { 
@@ -63,7 +80,19 @@ public class IsInfixParsedCorrectly
     [TestMethod]
     public void IsNegativeNumberParsedCorrectly()
     {
-        _parser.Expression = "-2";
+        _parser.Expression = new Token[]
+        {
+            new Token()
+            {
+                Type = TokenType.Operator,
+                Value = "-"
+            },
+            new Token()
+            {
+                Type = TokenType.Operator,
+                Value = "2"
+            }
+        };
 
         Token[] expectedOutput = new Token[]
         {
@@ -92,7 +121,44 @@ public class IsInfixParsedCorrectly
     [TestMethod]
     public void IsJuxtapositionParsedCorrectly()
     {
-        _parser.Expression = "2(4^3)";
+        _parser.Expression = new Token[]
+        {
+            new Token()
+            {
+                Value = "2",
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = "*",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "(",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "4",
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = "^",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "3",
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = ")",
+                Type = TokenType.Operator
+            }
+        };
 
         Token[] expectedOutput = new Token[]
         {
@@ -131,7 +197,55 @@ public class IsInfixParsedCorrectly
     [TestMethod]
     public void IsAdditionAfterBracketParsedCorrectly()
     {
-        _parser.Expression = "2(4^3)+2";
+        _parser.Expression = new Token[]
+        {
+            new Token()
+            {
+                Value = "2",
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = "*",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "(",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "4",
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = "^",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "3",
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = ")",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "+",
+                Type = TokenType.Operator
+            },
+
+            new Token()
+            {
+                Value = "2",
+                Type = TokenType.Number
+            }
+        };
 
         Token[] expectedOutput = new Token[]
         {
@@ -180,7 +294,34 @@ public class IsInfixParsedCorrectly
     [TestMethod]
     public void IsMultiplicationAtEndOfBrackedParsedCorrectly()
     {
-        _parser.Expression = "(3)2";
+        _parser.Expression = new Token[]
+        {
+            new Token()
+            {
+                Value = "(",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "3",
+                Type = TokenType.Number
+            },
+            new Token()
+            {
+                Value = ")",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "*",
+                Type = TokenType.Operator
+            },
+            new Token()
+            {
+                Value = "2",
+                Type = TokenType.Number
+            }
+        };
 
         Token[] expected = new Token[]
         {

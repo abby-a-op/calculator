@@ -5,7 +5,7 @@ public class InfixEvaluator
     private InfixToPostfixParser _infixParser = new InfixToPostfixParser();
     private PostfixParser _postfixParser = new PostfixParser();
 
-    public string Expression = "";
+    public Token[] Expression = new Token[] { };
 
     public double Evaluate()
     {

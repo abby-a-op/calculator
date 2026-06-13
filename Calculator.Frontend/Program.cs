@@ -4,14 +4,16 @@ public class Program
 {
     public static void Main()
     {
-        InfixEvaluator evaluator = new InfixEvaluator();
+        Interpreter interpreter = new Interpreter();
 
         while (true)
         {
             string input = Console.ReadLine() ?? "";
-            evaluator.Expression = input;
+            interpreter.Command = input;
 
-            Console.WriteLine(evaluator.Evaluate());
+            string result = interpreter.Run();
+
+            Console.WriteLine(result);
         }
     }
 }

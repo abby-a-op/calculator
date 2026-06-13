@@ -125,7 +125,7 @@ public class Interpreter
                 return NumberTheory.NumCheckDigit(digits).ToString();
             }
             default:
-                _Evaluator.Expression = Command;
+                _Evaluator.Expression = Tokenise();
                 return _Evaluator.Evaluate().ToString();
         }
     }
