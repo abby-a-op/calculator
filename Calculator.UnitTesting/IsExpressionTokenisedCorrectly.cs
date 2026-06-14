@@ -56,7 +56,7 @@ public class IsExpressionTokenisedCorrectly
             new Integer(2),
             new Operator(OperatorType.Modulo),
             new Integer(2),
-            new Function("!"),
+            new Text("!"),
             new Operator(OperatorType.Exponentiate),
             new Integer(2),
             new Operator(OperatorType.Multiply),
