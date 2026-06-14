@@ -2,21 +2,29 @@ namespace Calculator;
 
 public static class Functions
 {
-    public static double EvaluateFunction(string name, double x)
+    public static IToken EvaluateFunction(Text name, IToken x)
     {
-        return name switch
+        return name.Value switch
         {
             "sqrt" => Sqrt(x),
             "!" => Factorial(x),
-            _ => -1
+            _ => new Text($"No function named {name}")
         };
     }
 
-    public static double Factorial(double x)
+    public static IToken Factorial(IToken input)
     {
-        int n = (int)Math.Floor(x);
+        int n;
+        if (input.Type == TokenType.Integer)
+        {
+            n = ((Integer)input).Value;
 
-        return Factorial(n);
+            Integer output = new Integer();
+            output.Value = Factorial(n);
+            return output;
+        }
+
+        return new Text("Invalid type for factorial");
     }
 
     static int Factorial(int n)
@@ -34,5 +42,14 @@ public static class Functions
         return n * Factorial(n-1);
     }
 
-    public static double Sqrt(double x) => Math.Sqrt(x);
+    public static IToken Sqrt(IToken input)
+    {
+        if (input.Type == TokenType.Integer)
+        {
+            int n = ((Integer)input).Value;
+            return new Integer((int)Math.Sqrt(n));
+        }
+        
+        return new Text("Invalid");
+    }
 }

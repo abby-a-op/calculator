@@ -11,14 +11,27 @@ public class Interpreter
     const string DIGITS = "0123456789.";
     const string OPERATORS = "+-/*()^%";
 
-    public Token[] Tokenise()
-    {
-        List<Token> tokens = new List<Token>();
+    public Dictionary<string, IToken> Variables = new Dictionary<string, IToken>();
 
-        Token currentToken = new Token()
+    private IToken ParseTokenText(string tokenText, TokenType tokenType)
+    {
+        return tokenType switch
         {
-            Type = TokenType.Invalid
+            TokenType.Integer => new Integer(int.Parse(tokenText)),
+            TokenType.Text => new Text(tokenText),
+            TokenType.Operator => new Operator((OperatorType)tokenText[0]),
+            TokenType.Function => new Text(tokenText),
+            _ => throw new Exception()
         };
+    }
+
+    public IToken[] Tokenise()
+    {
+        List<IToken> tokens = new List<IToken>();
+        string currentTokenText = "";
+        TokenType currentTokenType = TokenType.Invalid;
+
+        IToken currentTokenData;
 
         for (int i=0; i<Command.Length; i++)
         {
@@ -26,22 +39,19 @@ public class Interpreter
 
             if (c == ' ')
             {
-                if (currentToken.Type == TokenType.Number)
+                if (currentTokenType == TokenType.Number)
                 {
-                    tokens.Add(currentToken);
-                    currentToken = new Token()
-                    {
-                        Type = TokenType.Invalid
-                    };
+                    currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
+                    tokens.Add(currentTokenData);
+                    currentTokenText = "";
                 }
-                else if (currentToken.Type != TokenType.Text)
+                else if (currentTokenType != TokenType.Text)
                 {
                     continue;
                 }
             }
 
             TokenType currentCharTokenType;
-
 
             if (DIGITS.Contains(c))
             {
@@ -53,18 +63,16 @@ public class Interpreter
             }
             else if (c == '"')
             {
-                if (currentToken.Type == TokenType.Text)
+                if (currentTokenType == TokenType.Text)
                 {
-                    tokens.Add(currentToken);
-                    currentToken = new Token()
-                    {
-                        Type = TokenType.Invalid
-                    };
+                    IToken data = ParseTokenText(currentTokenText, currentTokenType);
+                    tokens.Add(data);
+                    currentTokenText = "";
                     continue;
                 }
                 currentCharTokenType = TokenType.Text;
             }
-            else if (currentToken.Type == TokenType.Text)
+            else if (currentTokenType == TokenType.Text)
             {
                 currentCharTokenType = TokenType.Text;
             }
@@ -73,47 +81,38 @@ public class Interpreter
                 currentCharTokenType = TokenType.Function;
             }
             
-            if (currentToken.Type == TokenType.Invalid)
+            if (currentTokenType == TokenType.Invalid)
             {
-                currentToken.Type = currentCharTokenType;
+                currentTokenType = currentCharTokenType;
             }
-            else if (currentCharTokenType != currentToken.Type || currentCharTokenType == TokenType.Operator)
+            else if (currentCharTokenType != currentTokenType || currentCharTokenType == TokenType.Operator)
             {
-                tokens.Add(currentToken);
-                currentToken = new Token();
-                currentToken.Type = currentCharTokenType;
+                currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
+
+                tokens.Add(currentTokenData);
+                currentTokenType = currentCharTokenType;
+                currentTokenText = "";
             }
             
             if (c != '"')
             {
-                currentToken.Value += c;
+                currentTokenText += c;
             }
         }
 
-        tokens.Add(currentToken);
+        currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
+        tokens.Add(currentTokenData);
 
-        Token multiplication = new Token()
-        {
-            Type = TokenType.Operator,
-            Value = "*"
-        };
-
-        Token zero = new Token()
-        {
-            Type = TokenType.Number,
-            Value = "0"
-        };
-
-        if (tokens[0].Value == "-" || tokens[0].Value == "+")
-        {
-            tokens.Insert(0, zero);
-        }
+        Operator multiplication = new Operator(OperatorType.Multiply);
+        Integer zero = new Integer(0);
 
         for (int i = 0; i < tokens.Count-1; i++)
         {
-            if (tokens[i].Type == TokenType.Number || tokens[i].Value == ")")
+            if (tokens[i].Type == TokenType.Number || tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value == OperatorType.ClosingBracket)
             {
-                if (tokens[i + 1].Type == TokenType.Function || tokens[i+1].Value == "(")
+                if (
+                    tokens[i + 1].Type == TokenType.Function
+                    || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.ClosingBracket)
                 {
                     tokens.Insert(i + 1, multiplication);
                 }
@@ -122,9 +121,12 @@ public class Interpreter
 
         for (int i = 0; i < tokens.Count-1; i++)
         {
-            if (tokens[i].Type == TokenType.Operator && tokens[i].Value != ")")
+            if (tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value != OperatorType.ClosingBracket)
             {
-                if (tokens[i + 1].Value == "+" || tokens[i + 1].Value == "-")
+                if (
+                    tokens[i + 1].Type == TokenType.Operator &&
+                    (((Operator)tokens[i + 1]).Value == OperatorType.Plus || ((Operator)tokens[i + 1]).Value == OperatorType.Minus)
+                    )
                 {
                     tokens.Insert(i + 1, zero);
                 }
@@ -136,42 +138,42 @@ public class Interpreter
 
     public string Run()
     {
-        Token[] tokens = Tokenise();
+        IToken[] tokens = Tokenise();
 
         if (tokens[0].Type == TokenType.Function)
         {
-            switch (tokens[0].Value)
+            switch (((Text)tokens[0]).Value)
             {
                 case "caesarEn":
                 {
-                    string plaintext = tokens[1].Value;
+                    string plaintext = ((Text)tokens[1]).Value;
                     return Encryption.CaesarEn(plaintext);
                 }
                 case "caesarDe":
                 {
-                    string plaintext = tokens[1].Value;
+                    string plaintext = ((Text)tokens[1]).Value;
                     return Encryption.CaesarDe(plaintext);
                 }
                 case "numRand":
                 {
                     int a, x, c, m;
 
-                    a = int.Parse(tokens[1].Value);
-                    x = int.Parse(tokens[2].Value);
-                    c = int.Parse(tokens[3].Value);
-                    m = int.Parse(tokens[4].Value);
+                    a = ((Integer)tokens[1]).Value;
+                    x = ((Integer)tokens[2]).Value;
+                    c = ((Integer)tokens[3]).Value;
+                    m = ((Integer)tokens[4]).Value;
 
                     return NumberTheory.NumRand(a, x, c, m).ToString();
                 }
                 case "isPrime":
                 {
-                    int a = int.Parse(tokens[1].Value);
+                    int a = ((Integer)tokens[1]).Value;
 
                     return NumberTheory.IsPrime(a).ToString();
                 }
                 case "numCheckDigit":
                 {
-                    string digits = tokens[1].Value;
+                    string digits = ((Integer)tokens[1]).Output();
 
                     return NumberTheory.NumCheckDigit(digits).ToString();
                 }

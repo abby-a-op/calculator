@@ -2,37 +2,30 @@ namespace Calculator;
 
 public class InfixToPostfixParser
 {
-    static Dictionary<string, int> OperatorPrecedence = new Dictionary<string, int>()
+    static Dictionary<OperatorType, int> OperatorPrecedence = new Dictionary<OperatorType, int>()
     {
-        { "+", 1 },
-        { "-", 1 },
-        { "*", 2 },
-        { "/", 2 },
-        { "%", 2 },
-        { "^", 3 },
-        { "!", 3 }
+        { OperatorType.Plus, 1 },
+        { OperatorType.Minus, 1 },
+        { OperatorType.Multiply, 2 },
+        { OperatorType.Divide, 2 },
+        { OperatorType.Modulo, 2 },
+        { OperatorType.Exponentiate, 3 }
     };
 
-    public Token[] Expression = new Token[] { };
+    public IToken[] Expression = new IToken[] { };
 
     // Implementation of Shunting Yard Algorithm (Reference: https://mathcenter.oxford.emory.edu/site/cs171/shuntingYardAlgorithm)
-    public Token[] Parse()
+    public IToken[] Parse()
     {
-        Stack<Token> operatorStack = new Stack<Token>();
+        Stack<IToken> operatorStack = new Stack<IToken>();
 
         // The parsed postfix expression
-        List<Token> postfix = new List<Token>();
+        List<IToken> postfix = new List<IToken>();
 
-        foreach (Token token in Expression)
+        foreach (IToken token in Expression)
         {
             // Numbers are added directly to the expression
-            if (token.Type == TokenType.Number)
-            {
-                postfix.Add(token);
-                continue;
-            }
-
-            if (token.Value == "!")
+            if (token.Type == TokenType.Integer)
             {
                 postfix.Add(token);
                 continue;
@@ -41,20 +34,34 @@ public class InfixToPostfixParser
             // Functions are added to the stack, and are printed when the following opening bracket is closed
             if (token.Type == TokenType.Function)
             {
+                Text textToken = (Text)token;
+
+                // Since factorials are already a postfix operation, they can be written directly
+                if (textToken.Value == "!")
+                {
+                    postfix.Add(token);
+                    continue;
+                }
+
                 operatorStack.Push(token);
                 continue;
             }
 
             if (token.Type == TokenType.Operator)
             {
-                switch (token.Value)
+                Operator operatorToken = (Operator)token;
+                switch (operatorToken.Value)
                 {
-                    case "(":
+                    case OperatorType.OpeningBracket:
+                    {
                         operatorStack.Push(token);
                         break;
-                    case ")":
+                    }
+                    case OperatorType.ClosingBracket:
+                    {
                         ParseClosingBracket(operatorStack, postfix);
                         break;
+                    }
                     default:
                         if (operatorStack.Count == 0)
                         {
@@ -62,21 +69,15 @@ public class InfixToPostfixParser
                             break;
                         }
 
-                        Token topOperator = operatorStack.Peek();
+                        Operator nextOperator = (Operator)operatorStack.Peek();
 
-                        if (topOperator.Value == "(")
-                        {
-                            operatorStack.Push(token);
-                            break;
-                        }
-
-                        int currentPrecedence = OperatorPrecedence[token.Value];
-                        int topPrecedence = OperatorPrecedence[topOperator.Value];
+                        int currentPrecedence = OperatorPrecedence[operatorToken.Value];
+                        int topPrecedence = OperatorPrecedence[nextOperator.Value];
 
                         if (
                             currentPrecedence > topPrecedence
-                            || currentPrecedence == topPrecedence && token.Value == "^"
-                            || topOperator.Value == "("
+                            || currentPrecedence == topPrecedence && operatorToken.Value == OperatorType.Exponentiate
+                            || nextOperator.Value == OperatorType.OpeningBracket
                             )
                         {
                             operatorStack.Push(token);
@@ -85,10 +86,10 @@ public class InfixToPostfixParser
 
                         if (
                             currentPrecedence < topPrecedence
-                            || currentPrecedence == topPrecedence && token.Value != "^"
+                            || currentPrecedence == topPrecedence && operatorToken.Value != OperatorType.Exponentiate
                         )
                         {
-                            ParseLowerPrecedence(operatorStack, postfix, token, currentPrecedence, topPrecedence);
+                            ParseLowerPrecedence(operatorStack, postfix, operatorToken, currentPrecedence, topPrecedence);
                             break;
                         }
 
@@ -107,42 +108,43 @@ public class InfixToPostfixParser
         return postfix.ToArray();
     }
 
-    private static void ParseLowerPrecedence(Stack<Token> operatorStack, List<Token> postfix, Token token, int currentPrecedence, int topPrecedence)
+    private static void ParseLowerPrecedence(Stack<IToken> operatorStack, List<IToken> postfix, Operator token, int currentPrecedence, int topPrecedence)
     {
         while (
             (currentPrecedence < topPrecedence
-            || currentPrecedence == topPrecedence && token.Value != "^")
+            || currentPrecedence == topPrecedence && token.Value != OperatorType.Exponentiate)
             && operatorStack.Count != 0
             )
         {
             postfix.Add(operatorStack.Pop());
             if (operatorStack.Count != 0)
             {
-                topPrecedence = OperatorPrecedence[operatorStack.Peek().Value];
+                Operator nextOperator = (Operator)operatorStack.Peek();
+                topPrecedence = OperatorPrecedence[nextOperator.Value];
             }
         }
 
         operatorStack.Push(token);
     }
 
-    private static void ParseClosingBracket(Stack<Token> operatorStack, List<Token> postfix)
+    private static void ParseClosingBracket(Stack<IToken> operatorStack, List<IToken> postfix)
     {
-        Token poppedOperator;
+        IToken poppedOperator;
 
         do
         {
             poppedOperator = operatorStack.Pop();
 
-            if (poppedOperator.Value != "(")
+            if (poppedOperator.Type == TokenType.Operator && ((Operator)poppedOperator).Value != OperatorType.ClosingBracket)
             {
                 postfix.Add(poppedOperator);
 
-                if (operatorStack.TryPeek(out Token topToken) && topToken.Type == TokenType.Function)
+                if (operatorStack.TryPeek(out IToken topToken) && topToken.Type == TokenType.Function)
                 {
                     postfix.Add(operatorStack.Pop());
                 }
             }
-        } while (poppedOperator.Value != "(");
+        } while (poppedOperator.Type != TokenType.Operator && ((Operator)poppedOperator).Value != OperatorType.OpeningBracket);
         return;
     }
 }
