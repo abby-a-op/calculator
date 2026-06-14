@@ -9,7 +9,7 @@ public class InfixToPostfixParser
         { OperatorType.Multiply, 2 },
         { OperatorType.Divide, 2 },
         { OperatorType.Modulo, 2 },
-        { OperatorType.Exponentiate, 3 }
+        { OperatorType.Exponentiate, 3 },
     };
 
     public IToken[] Expression = new IToken[] { };
@@ -71,13 +71,18 @@ public class InfixToPostfixParser
 
                         Operator nextOperator = (Operator)operatorStack.Peek();
 
+                        if (nextOperator.Value == OperatorType.OpeningBracket)
+                        {
+                            operatorStack.Push(token);
+                            break;
+                        }
+
                         int currentPrecedence = OperatorPrecedence[operatorToken.Value];
                         int topPrecedence = OperatorPrecedence[nextOperator.Value];
 
                         if (
                             currentPrecedence > topPrecedence
                             || currentPrecedence == topPrecedence && operatorToken.Value == OperatorType.Exponentiate
-                            || nextOperator.Value == OperatorType.OpeningBracket
                             )
                         {
                             operatorStack.Push(token);
