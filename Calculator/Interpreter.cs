@@ -45,7 +45,7 @@ public class Interpreter
                     tokens.Add(currentTokenData);
                     currentTokenText = "";
                 }
-                else if (currentTokenType != TokenType.Text)
+                if (currentTokenType != TokenType.Text)
                 {
                     continue;
                 }
@@ -139,7 +139,7 @@ public class Interpreter
     public string Run()
     {
         IToken[] tokens = Tokenise();
-        
+
         if (tokens[0].Type == TokenType.Function)
         {
             switch (((Function)tokens[0]).Value)
