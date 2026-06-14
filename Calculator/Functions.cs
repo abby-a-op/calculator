@@ -8,7 +8,7 @@ public static class Functions
         {
             "sqrt" => Sqrt(x),
             "!" => Factorial(x),
-            _ => new Function($"No function named {func}")
+            _ => new Text($"No function named {func}")
         };
     }
 
@@ -24,7 +24,7 @@ public static class Functions
             return output;
         }
 
-        return new Function("Invalid type for factorial");
+        return new Text("Invalid type for factorial");
     }
 
     static int Factorial(int n)
@@ -50,6 +50,6 @@ public static class Functions
             return new Integer((int)Math.Sqrt(n));
         }
         
-        return new Function("Invalid");
+        return new Text("Invalid");
     }
 }
