@@ -35,7 +35,7 @@ public struct Integer: IToken<int>
                 OperatorType.Multiply => a*b,
                 OperatorType.Divide => a/b,
                 OperatorType.Exponentiate => (int)Math.Pow(a, b),
-                OperatorType.Modulo => a%b,
+                OperatorType.Modulo => Mod(a, b),
                 _ => -1
             };
 
@@ -43,6 +43,14 @@ public struct Integer: IToken<int>
         }
 
         return new Integer(-1);
+    }
+
+    private int Mod(int a, int b)
+    {
+        int res = a%b;
+
+        if (res < 0) res += b;
+        return res;
     }
 
     public string Output() => Value.ToString();
