@@ -4,13 +4,13 @@ namespace Calculator;
 
 public static class NumberTheory
 {
-    public static int NumRand(int a, int x, int c, int m)
+    public static string NumRand(int a, int x, int c, int m)
     {
         int next = (a * x + c) % m;
 
         if (next < 0) next += m;
 
-        return next;
+        return $"{next} = ({a}*{x} + {c}) mod {m}";
     }
 
     public static bool IsPrime(int n)

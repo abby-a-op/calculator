@@ -1,3 +1,5 @@
+using System.Net.Sockets;
+
 namespace Calculator;
 
 public class Interpreter
@@ -32,10 +34,14 @@ public class Interpreter
                         Type = TokenType.Invalid
                     };
                 }
-                continue;
+                else if (currentToken.Type != TokenType.Text)
+                {
+                    continue;
+                }
             }
 
             TokenType currentCharTokenType;
+
 
             if (DIGITS.Contains(c))
             {
@@ -45,23 +51,43 @@ public class Interpreter
             {
                 currentCharTokenType = TokenType.Operator;
             }
+            else if (c == '"')
+            {
+                if (currentToken.Type == TokenType.Text)
+                {
+                    tokens.Add(currentToken);
+                    currentToken = new Token()
+                    {
+                        Type = TokenType.Invalid
+                    };
+                    continue;
+                }
+                currentCharTokenType = TokenType.Text;
+            }
+            else if (currentToken.Type == TokenType.Text)
+            {
+                currentCharTokenType = TokenType.Text;
+            }
             else
             {
                 currentCharTokenType = TokenType.Function;
             }
+            
             if (currentToken.Type == TokenType.Invalid)
             {
                 currentToken.Type = currentCharTokenType;
             }
-            else if (currentCharTokenType != currentToken.Type || currentCharTokenType == TokenType.Operator || currentToken.Type == TokenType.Number && c == ' ')
+            else if (currentCharTokenType != currentToken.Type || currentCharTokenType == TokenType.Operator)
             {
                 tokens.Add(currentToken);
                 currentToken = new Token();
                 currentToken.Type = currentCharTokenType;
             }
             
-
-            currentToken.Value += c;
+            if (c != '"')
+            {
+                currentToken.Value += c;
+            }
         }
 
         tokens.Add(currentToken);
@@ -116,6 +142,16 @@ public class Interpreter
         {
             switch (tokens[0].Value)
             {
+                case "caesarEn":
+                {
+                    string plaintext = tokens[1].Value;
+                    return Encryption.CaesarEn(plaintext);
+                }
+                case "caesarDe":
+                {
+                    string plaintext = tokens[1].Value;
+                    return Encryption.CaesarDe(plaintext);
+                }
                 case "numRand":
                 {
                     int a, x, c, m;
@@ -145,14 +181,14 @@ public class Interpreter
                 }
             }
         }
-        else if (tokens.Length == 0)
-        {
-            return "";
-        }
-        else
+        else if (tokens[0].Type != TokenType.Text)
         {
             _Evaluator.Expression = tokens;
             return _Evaluator.Evaluate().ToString();
+        }
+        else
+        {
+            return "";
         }
     }
 }

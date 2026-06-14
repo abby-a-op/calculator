@@ -12,4 +12,6 @@ public enum TokenType
     Number,
     Operator,
     Function,
+    Text,
+    Variable
 }
