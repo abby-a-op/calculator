@@ -10,16 +10,28 @@ public class IsExpressionTokenisedCorrectly
         _interpreter = new Interpreter();
     }
 
-    bool TokensEqual(Token[] expected, Token[] actual)
+    bool TokensEqual(IToken[] expected, IToken[] actual)
     {
         if (expected.Length != actual.Length)
         {
             return false;
         }
 
+        foreach (var token in expected)
+        {
+            Console.Write($"{token.Output()} ({token.Type}) ");
+        }
+        Console.WriteLine();
+
+        foreach (var token in actual)
+        {
+            Console.Write($"{token.Output()} ({token.Type}) ");
+        }
+        Console.WriteLine();
+
         for (int i=0; i<expected.Length; i++)
         {
-            if (expected[i].Type != actual[i].Type || expected[i].Value != actual[i].Value)
+            if (expected[i].Type != actual[i].Type || !expected[i].Value.Equals(actual[i].Value))
             {
                 return false;
             }
@@ -33,108 +45,28 @@ public class IsExpressionTokenisedCorrectly
     {
         _interpreter.Command = "2+3-3*2%2!^2*2*(2-3)";
 
-        Token[] expected = new Token[]
+        IToken[] expected = new IToken[]
         {
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "+",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "-",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "%",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "!",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "^",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "(",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "-",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = ")",
-                Type = TokenType.Operator
-            }
+            new Integer(2),
+            new Operator(OperatorType.Plus),
+            new Integer(3),
+            new Operator(OperatorType.Minus),
+            new Integer(3),
+            new Operator(OperatorType.Multiply),
+            new Integer(2),
+            new Operator(OperatorType.Modulo),
+            new Integer(2),
+            new Function("!"),
+            new Operator(OperatorType.Exponentiate),
+            new Integer(2),
+            new Operator(OperatorType.Multiply),
+            new Integer(2),
+            new Operator(OperatorType.Multiply),
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(2),
+            new Operator(OperatorType.Minus),
+            new Integer(3),
+            new Operator(OperatorType.ClosingBracket)
         };
 
         Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
@@ -145,23 +77,11 @@ public class IsExpressionTokenisedCorrectly
     {
         _interpreter.Command = "-2";
 
-        Token[] expected = new Token[]
+        IToken[] expected = new IToken[]
         {
-            new Token()
-            {
-                Value = "0",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "-",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            }
+            new Integer(0),
+            new Operator(OperatorType.Minus),
+            new Integer(2)
         };
 
         Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
@@ -172,43 +92,15 @@ public class IsExpressionTokenisedCorrectly
     {
         _interpreter.Command = "2(4^3)";
 
-        Token[] expected = new Token[]
+        IToken[] expected = new IToken[]
         {
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "(",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "4",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "^",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = ")",
-                Type = TokenType.Operator
-            }
+            new Integer(2),
+            new Operator(OperatorType.Multiply),
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(4),
+            new Operator(OperatorType.Exponentiate),
+            new Integer(3),
+            new Operator(OperatorType.ClosingBracket)
         };
 
         Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
@@ -219,55 +111,18 @@ public class IsExpressionTokenisedCorrectly
     {
         _interpreter.Command = "2(4^3)+2";
 
-        Token[] expected = new Token[]
+        IToken[] expected = new IToken[]
         {
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "(",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "4",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "^",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = ")",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "+",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            }
+            new Integer(2),
+            new Operator(OperatorType.Multiply),
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(4),
+            new Operator(OperatorType.Exponentiate),
+            new Integer(3),
+            new Operator(OperatorType.ClosingBracket),
+            new Operator(OperatorType.Plus),
+            new Integer(2)
         };
-
         Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
     }
 
@@ -276,43 +131,15 @@ public class IsExpressionTokenisedCorrectly
     {
         _interpreter.Command = "(-2)^2";
 
-        Token[] expected = new Token[]
+        IToken[] expected = new IToken[]
         {
-            new Token()
-            {
-                Value = "(",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "0",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "-",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = ")",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "^",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(0),
+            new Operator(OperatorType.Minus),
+            new Integer(2),
+            new Operator(OperatorType.ClosingBracket),
+            new Operator(OperatorType.Exponentiate),
+            new Integer(2)
         };
 
         Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));

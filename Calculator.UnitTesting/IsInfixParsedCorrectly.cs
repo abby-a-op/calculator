@@ -1,6 +1,3 @@
-using System.Security;
-using Newtonsoft.Json.Bson;
-
 namespace Calculator.UnitTesting;
 
 [TestClass]
@@ -12,105 +9,51 @@ public class IsInfixParsedCorrectly
         _parser = new InfixToPostfixParser();
     }
 
-    private bool ExpressionEqual(Token[] expected, Token[] actual)
+    bool ExpressionEqual(IToken[] expected, IToken[] actual)
     {
         if (expected.Length != actual.Length)
         {
             return false;
         }
 
-        for (int i=0; i<actual.Length; i++)
+        foreach (var token in expected)
         {
-            if (!(expected[i].Type==actual[i].Type && expected[i].Value==actual[i].Value))
+            Console.Write($"{token.Output()} ({token.Type}) ");
+        }
+        Console.WriteLine();
+
+        foreach (var token in actual)
+        {
+            Console.Write($"{token.Output()} ({token.Type}) ");
+        }
+        Console.WriteLine();
+
+        for (int i=0; i<expected.Length; i++)
+        {
+            if (expected[i].Type != actual[i].Type || !expected[i].Value.Equals(actual[i].Value))
             {
                 return false;
             }
         }
 
         return true;
-
     }
 
     [TestMethod]
     public void IsMultiplicationParsedCorrectly()
     {
-        _parser.Expression = new Token[]
+        _parser.Expression = new IToken[]
         {
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            }
+            new Integer(2),
+            new Operator(OperatorType.Multiply),
+            new Integer(3)
         };
 
-        Token[] expectedOutput = new Token[]
+        IToken[] expectedOutput = new IToken[]
         { 
-            new Token()
-            {
-                Value="2",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value="3",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value="*",
-                Type=TokenType.Operator
-            }
-        };
-        
-        bool isEqual = ExpressionEqual(_parser.Parse(), expectedOutput);
-
-        Assert.IsTrue(isEqual);
-    }
-
-    [TestMethod]
-    public void IsNegativeNumberParsedCorrectly()
-    {
-        _parser.Expression = new Token[]
-        {
-            new Token()
-            {
-                Type = TokenType.Operator,
-                Value = "-"
-            },
-            new Token()
-            {
-                Type = TokenType.Operator,
-                Value = "2"
-            }
-        };
-
-        Token[] expectedOutput = new Token[]
-        {
-            new Token()
-            {
-                Value="0",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value="2",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value="-",
-                Type=TokenType.Operator
-            }
+            new Integer(2),
+            new Integer(3),
+            new Operator(OperatorType.Multiply)
         };
         
         bool isEqual = ExpressionEqual(_parser.Parse(), expectedOutput);
@@ -121,72 +64,24 @@ public class IsInfixParsedCorrectly
     [TestMethod]
     public void IsJuxtapositionParsedCorrectly()
     {
-        _parser.Expression = new Token[]
+        _parser.Expression = new IToken[]
         {
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "(",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "4",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "^",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = ")",
-                Type = TokenType.Operator
-            }
+            new Integer(2),
+            new Operator(OperatorType.Multiply),
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(4),
+            new Operator(OperatorType.Exponentiate),
+            new Integer(3),
+            new Operator(OperatorType.ClosingBracket)
         };
 
-        Token[] expectedOutput = new Token[]
+        IToken[] expectedOutput = new IToken[]
         {
-            new Token()
-            {
-                Value="2",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value="4",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value="3",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value = "^",
-                Type=TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "*",
-                Type=TokenType.Operator
-            }
+            new Integer(2),
+            new Integer(4),
+            new Integer(3),
+            new Operator(OperatorType.Exponentiate),
+            new Operator(OperatorType.Multiply)
         };
         
         bool isEqual = ExpressionEqual(_parser.Parse(), expectedOutput);
@@ -197,93 +92,28 @@ public class IsInfixParsedCorrectly
     [TestMethod]
     public void IsAdditionAfterBracketParsedCorrectly()
     {
-        _parser.Expression = new Token[]
+        _parser.Expression = new IToken[]
         {
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "(",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "4",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "^",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = ")",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "+",
-                Type = TokenType.Operator
-            },
-
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            }
+            new Integer(2),
+            new Operator(OperatorType.Multiply),
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(4),
+            new Operator(OperatorType.Exponentiate),
+            new Integer(3),
+            new Operator(OperatorType.ClosingBracket),
+            new Operator(OperatorType.Plus),
+            new Integer(2)
         };
 
-        Token[] expectedOutput = new Token[]
+        IToken[] expectedOutput = new IToken[]
         {
-            new Token()
-            {
-                Value="2",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value="4",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value="3",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value = "^",
-                Type=TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type=TokenType.Number
-            },
-            new Token()
-            {
-                Value = "+",
-                Type=TokenType.Operator
-            }
+            new Integer(2),
+            new Integer(4),
+            new Integer(3),
+            new Operator(OperatorType.Exponentiate),
+            new Operator(OperatorType.Multiply),
+            new Integer(2),
+            new Operator(OperatorType.Plus)
         };
 
         bool isEqual = ExpressionEqual(_parser.Parse(), expectedOutput);
@@ -294,52 +124,20 @@ public class IsInfixParsedCorrectly
     [TestMethod]
     public void IsMultiplicationAtEndOfBrackedParsedCorrectly()
     {
-        _parser.Expression = new Token[]
+        _parser.Expression = new IToken[]
         {
-            new Token()
-            {
-                Value = "(",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = ")",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            }
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(3),
+            new Operator(OperatorType.ClosingBracket),
+            new Operator(OperatorType.Multiply),
+            new Integer(2)
         };
 
-        Token[] expected = new Token[]
+        IToken[] expected = new IToken[]
         {
-            new Token()
-            {
-                Value = "3",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "2",
-                Type = TokenType.Number
-            },
-            new Token()
-            {
-                Value = "*",
-                Type = TokenType.Operator
-            }
+            new Integer(3),
+            new Integer(2),
+            new Operator(OperatorType.Multiply)
         };
 
         bool isCorrect = ExpressionEqual(expected, _parser.Parse());
