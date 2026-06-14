@@ -1,15 +1,15 @@
 namespace Calculator;
 
-public struct Integer: IToken
+public struct Integer: IToken<int>
 {
-    public int Value;
+    public int Value { get; set; }
 
     public Integer(int value)
     {
         this.Value = value;
     }
 
-    static TokenType _Type => TokenType.Integer;
+    public TokenType Type => TokenType.Integer;
 
     public IToken ApplyOperation(IToken rhs, OperatorType op)
     {

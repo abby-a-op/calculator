@@ -33,13 +33,13 @@ public class PostfixParser
                     )
                 )
             {
-                IToken popped = (Operator)OperatorStack.Pop();
+                IToken popped = OperatorStack.Pop();
 
                 if (popped.Type == TokenType.Function)
                 {
                     IToken n = NumberStack.Pop();
 
-                    IToken result = Functions.EvaluateFunction((Text)popped, n);
+                    IToken result = Functions.EvaluateFunction((Function)popped, n);
 
                     NumberStack.Push(result);
                 }

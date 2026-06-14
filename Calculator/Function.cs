@@ -1,14 +1,12 @@
-using System.Runtime.CompilerServices;
-
 namespace Calculator;
 
-public struct Text: IToken<string>
+public struct Function: IToken<string>
 {
     public string Value { get; set; }
 
-    public TokenType Type => TokenType.Text;
+    public TokenType Type => TokenType.Function;
 
-    public Text(string value)
+    public Function(string value)
     {
         this.Value = value;
     }
@@ -20,9 +18,9 @@ public struct Text: IToken<string>
         if (rhs.Type == TokenType.Text)
         {
             string a = Value;
-            string b = ((Text)rhs).Value;
+            string b = ((Function)rhs).Value;
 
-            return new Text(a+b);
+            return new Function(a+b);
         }
 
         throw new InvalidOperationException($"{Type} {(char)op} {rhs.Type} is invalid");

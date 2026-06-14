@@ -20,7 +20,7 @@ public class Interpreter
             TokenType.Integer => new Integer(int.Parse(tokenText)),
             TokenType.Text => new Text(tokenText),
             TokenType.Operator => new Operator((OperatorType)tokenText[0]),
-            TokenType.Function => new Text(tokenText),
+            TokenType.Function => new Function(tokenText),
             _ => throw new Exception()
         };
     }
@@ -39,7 +39,7 @@ public class Interpreter
 
             if (c == ' ')
             {
-                if (currentTokenType == TokenType.Number)
+                if (currentTokenType == TokenType.Integer)
                 {
                     currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
                     tokens.Add(currentTokenData);
@@ -55,7 +55,7 @@ public class Interpreter
 
             if (DIGITS.Contains(c))
             {
-                currentCharTokenType = TokenType.Number;
+                currentCharTokenType = TokenType.Integer;
             }
             else if (OPERATORS.Contains(c))
             {
@@ -108,11 +108,11 @@ public class Interpreter
 
         for (int i = 0; i < tokens.Count-1; i++)
         {
-            if (tokens[i].Type == TokenType.Number || tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value == OperatorType.ClosingBracket)
+            if (tokens[i].Type == TokenType.Integer || tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value == OperatorType.ClosingBracket)
             {
                 if (
                     tokens[i + 1].Type == TokenType.Function
-                    || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.ClosingBracket)
+                    || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket)
                 {
                     tokens.Insert(i + 1, multiplication);
                 }
@@ -139,10 +139,10 @@ public class Interpreter
     public string Run()
     {
         IToken[] tokens = Tokenise();
-
+        
         if (tokens[0].Type == TokenType.Function)
         {
-            switch (((Text)tokens[0]).Value)
+            switch (((Function)tokens[0]).Value)
             {
                 case "caesarEn":
                 {
@@ -179,14 +179,15 @@ public class Interpreter
                 }
                 default:
                 {
-                    return "";
+                    _Evaluator.Expression = tokens;
+                    return _Evaluator.Evaluate().Output();
                 }
             }
         }
         else if (tokens[0].Type != TokenType.Text)
         {
             _Evaluator.Expression = tokens;
-            return _Evaluator.Evaluate().ToString();
+            return _Evaluator.Evaluate().Output();
         }
         else
         {

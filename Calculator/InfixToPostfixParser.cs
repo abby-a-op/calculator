@@ -34,10 +34,10 @@ public class InfixToPostfixParser
             // Functions are added to the stack, and are printed when the following opening bracket is closed
             if (token.Type == TokenType.Function)
             {
-                Text textToken = (Text)token;
+                Function functionToken = (Function)token;
 
                 // Since factorials are already a postfix operation, they can be written directly
-                if (textToken.Value == "!")
+                if (functionToken.Value == "!")
                 {
                     postfix.Add(token);
                     continue;

@@ -4,9 +4,15 @@ public interface IToken
 {
     public IToken ApplyOperation(IToken rhs, OperatorType op);
 
-    static TokenType _Type { get; }
+    public TokenType Type { get; }
 
-    public TokenType Type => _Type;
+    public object Value { get; set; }
 
     public string Output();
+}
+
+public interface IToken<T>: IToken
+{
+    public new T Value { get; set; }
+    object IToken.Value { get => Value; set => Value = (T)value; }
 }
