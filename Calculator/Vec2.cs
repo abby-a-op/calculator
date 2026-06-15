@@ -27,6 +27,11 @@ public struct Vec2: IToken
         return new Vec2(X * s, Y * s);
     }
 
+    public double Dot(Vec2 b)
+    {
+        return X * b.X + Y * b.Y;
+    }
+
     public double Length()
     {
         return Math.Sqrt(X*X + Y*Y);
