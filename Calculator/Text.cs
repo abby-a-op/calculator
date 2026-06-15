@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace Calculator;
 
-public struct Text: IToken<string>
+public struct Text: IToken
 {
     public string Value { get; set; }
 

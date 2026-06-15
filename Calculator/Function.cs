@@ -1,6 +1,6 @@
 namespace Calculator;
 
-public struct Function: IToken<string>
+public struct Function: IToken
 {
     public string Value { get; set; }
 

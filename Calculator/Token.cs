@@ -10,5 +10,6 @@ public enum TokenType
     Text = 8,
     Variable = 16,
     Integer = 32,
-    Operand = Integer | Real
+    Vec2 = 64,
+    Operand = Integer | Real | Vec2
 }

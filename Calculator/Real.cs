@@ -1,6 +1,6 @@
 namespace Calculator;
 
-public class Real: IToken<double>
+public class Real: IToken
 {
     public double Value { get; set; }
 
@@ -23,7 +23,8 @@ public class Real: IToken<double>
                 OperatorType.Plus => Value + x,
                 OperatorType.Minus => Value - x,
                 OperatorType.Exponentiate => Math.Pow(Value, x),
-                OperatorType.Modulo => Mod(Value, x)
+                OperatorType.Modulo => Mod(Value, x),
+                _ => double.NaN
             };
 
             return new Real(res);

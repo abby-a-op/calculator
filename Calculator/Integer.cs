@@ -1,6 +1,6 @@
 namespace Calculator;
 
-public struct Integer: IToken<int>
+public struct Integer: IToken
 {
     public int Value { get; set; }
 

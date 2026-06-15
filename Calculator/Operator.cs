@@ -1,6 +1,6 @@
 namespace Calculator;
 
-public struct Operator: IToken<OperatorType>
+public struct Operator: IToken
 {
     public TokenType Type => TokenType.Operator;
 
