@@ -121,7 +121,7 @@ public class Interpreter
 
         for (int i = 0; i < tokens.Count-1; i++)
         {
-            if (tokens[i].Type == TokenType.Real || tokens[i].Type == TokenType.Integer || tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value == OperatorType.ClosingBracket)
+            if ((tokens[i].Type & TokenType.Operand) != TokenType.Invalid || tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value == OperatorType.ClosingBracket)
             {
                 if (
                     tokens[i + 1].Type == TokenType.Function

@@ -42,7 +42,7 @@ public struct Integer: IToken<int>
             return new Integer(result);
         }
 
-        return new Integer(-1);
+        return new Text("Invalid");
     }
 
     private int Mod(int a, int b)
