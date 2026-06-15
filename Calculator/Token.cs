@@ -1,12 +1,14 @@
 namespace Calculator;
 
+[Flags]
 public enum TokenType
 {
-    Invalid = -1,
-    Number,
+    Invalid,
+    Real,
     Operator,
     Function,
     Text,
     Variable,
-    Integer
+    Integer,
+    Operand = Integer | Real
 }

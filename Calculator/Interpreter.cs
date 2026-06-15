@@ -8,7 +8,7 @@ public class Interpreter
 
     private InfixEvaluator _Evaluator = new InfixEvaluator();
 
-    const string DIGITS = "0123456789.";
+    const string DIGITS = "0123456789";
     const string OPERATORS = "+-/*()^%";
 
     public Dictionary<string, IToken> Variables = new Dictionary<string, IToken>();
@@ -21,6 +21,7 @@ public class Interpreter
             TokenType.Text => new Text(tokenText),
             TokenType.Operator => new Operator((OperatorType)tokenText[0]),
             TokenType.Function => new Function(tokenText),
+            TokenType.Real => new Real(double.Parse(tokenText)),
             _ => throw new Exception()
         };
     }
@@ -55,7 +56,14 @@ public class Interpreter
 
             if (DIGITS.Contains(c))
             {
-                currentCharTokenType = TokenType.Integer;
+                if (currentTokenType == TokenType.Real)
+                {
+                    currentCharTokenType = TokenType.Real;
+                }
+                else
+                {
+                    currentCharTokenType = TokenType.Integer;
+                }
             }
             else if (OPERATORS.Contains(c))
             {
@@ -71,6 +79,11 @@ public class Interpreter
                     continue;
                 }
                 currentCharTokenType = TokenType.Text;
+            }
+            else if (c == '.' && currentTokenType == TokenType.Integer)
+            {
+                currentTokenType = TokenType.Real;
+                currentCharTokenType = TokenType.Real;
             }
             else if (currentTokenType == TokenType.Text)
             {
@@ -108,7 +121,7 @@ public class Interpreter
 
         for (int i = 0; i < tokens.Count-1; i++)
         {
-            if (tokens[i].Type == TokenType.Integer || tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value == OperatorType.ClosingBracket)
+            if (tokens[i].Type == TokenType.Real || tokens[i].Type == TokenType.Integer || tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value == OperatorType.ClosingBracket)
             {
                 if (
                     tokens[i + 1].Type == TokenType.Function

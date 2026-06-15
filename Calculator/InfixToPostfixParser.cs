@@ -25,7 +25,7 @@ public class InfixToPostfixParser
         foreach (IToken token in Expression)
         {
             // Numbers are added directly to the expression
-            if (token.Type == TokenType.Integer)
+            if (token.Type == TokenType.Integer || token.Type == TokenType.Real)
             {
                 postfix.Add(token);
                 continue;
