@@ -28,6 +28,13 @@ public class Real: IToken<double>
 
             return new Real(res);
         }
+        else if (rhs.Type == TokenType.Integer)
+        {
+            int n = ((Integer)rhs).Value;
+
+            Real token = new Real(n);
+            return ApplyOperation(token, op);
+        }
 
         return new Text("Invalid");
     }

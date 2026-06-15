@@ -41,6 +41,12 @@ public struct Integer: IToken<int>
 
             return new Integer(result);
         }
+        else if (rhs.Type == TokenType.Real)
+        {
+            Real castToReal = new Real(Value);
+
+            return castToReal.ApplyOperation(rhs, op);
+        }
 
         return new Text("Invalid");
     }
