@@ -132,16 +132,26 @@ public class Interpreter
             }
         }
 
+        if (tokens[0].Type == TokenType.Operator)
+        {
+            Operator currentToken = (Operator)tokens[0];
+            if (currentToken.Value == OperatorType.Plus) currentToken.Value = OperatorType.UnaryPlus;
+            if (currentToken.Value == OperatorType.Minus) currentToken.Value = OperatorType.UnaryMinus;
+
+            tokens[0] = currentToken;
+        }
+
         for (int i = 0; i < tokens.Count-1; i++)
         {
             if (tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value != OperatorType.ClosingBracket)
             {
-                if (
-                    tokens[i + 1].Type == TokenType.Operator &&
-                    (((Operator)tokens[i + 1]).Value == OperatorType.Plus || ((Operator)tokens[i + 1]).Value == OperatorType.Minus)
-                    )
+                if (tokens[i+1].Type == TokenType.Operator)
                 {
-                    tokens.Insert(i + 1, zero);
+                    Operator currentToken = (Operator)tokens[i+1];
+                    if (currentToken.Value == OperatorType.Plus) currentToken.Value = OperatorType.UnaryPlus;
+                    if (currentToken.Value == OperatorType.Minus) currentToken.Value = OperatorType.UnaryMinus;
+
+                    tokens[i+1] = currentToken;
                 }
             }
         }

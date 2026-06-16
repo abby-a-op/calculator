@@ -11,41 +11,55 @@ public struct Integer: IToken
 
     public TokenType Type => TokenType.Integer;
 
-    public IToken ApplyOperation(IToken rhs, OperatorType op)
+    public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
-        if (rhs.Type == TokenType.Integer)
+        if (rhs != null)
         {
-            int a = this.Value;
-            int b = ((Integer)rhs).Value;
-
-            if (op == OperatorType.Divide && b == 0)
+            if (rhs.Type == TokenType.Integer)
             {
-                throw new DivideByZeroException();
-            }
+                int a = this.Value;
+                int b = ((Integer)rhs).Value;
 
-            if (op == OperatorType.Exponentiate && a == 0 && b == 0)
+                if (op == OperatorType.Divide && b == 0)
+                {
+                    throw new DivideByZeroException();
+                }
+
+                if (op == OperatorType.Exponentiate && a == 0 && b == 0)
+                {
+                    throw new ArithmeticException();
+                }
+
+                int result = op switch
+                {
+                    OperatorType.Plus => a+b,
+                    OperatorType.Minus => a-b,
+                    OperatorType.Multiply => a*b,
+                    OperatorType.Divide => a/b,
+                    OperatorType.Exponentiate => (int)Math.Pow(a, b),
+                    OperatorType.Modulo => Mod(a, b),
+                    _ => -1
+                };
+
+                return new Integer(result);
+            }
+            else if (rhs.Type == TokenType.Real)
             {
-                throw new ArithmeticException();
-            }
+                Real castToReal = new Real(Value);
 
+                return castToReal.ApplyOperation(rhs, op);
+            }
+        }
+        else
+        {
             int result = op switch
             {
-                OperatorType.Plus => a+b,
-                OperatorType.Minus => a-b,
-                OperatorType.Multiply => a*b,
-                OperatorType.Divide => a/b,
-                OperatorType.Exponentiate => (int)Math.Pow(a, b),
-                OperatorType.Modulo => Mod(a, b),
-                _ => -1
+                OperatorType.UnaryMinus => -Value,
+                OperatorType.UnaryPlus => Value,
+                _ => throw new InvalidOperationException()
             };
 
             return new Integer(result);
-        }
-        else if (rhs.Type == TokenType.Real)
-        {
-            Real castToReal = new Real(Value);
-
-            return castToReal.ApplyOperation(rhs, op);
         }
 
         return new Text("Invalid");

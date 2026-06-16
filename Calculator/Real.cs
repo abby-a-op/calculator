@@ -11,30 +11,44 @@ public class Real: IToken
         this.Value = value;
     }
 
-    public IToken ApplyOperation(IToken rhs, OperatorType op)
+    public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
-        if (rhs.Type == TokenType.Real)
+        if (rhs != null)
         {
-            double x = ((Real)rhs).Value; 
+            if (rhs.Type == TokenType.Real)
+            {
+                double x = ((Real)rhs).Value; 
+                double res = op switch
+                {
+                    OperatorType.Multiply => Value * x,
+                    OperatorType.Divide => Value / x,
+                    OperatorType.Plus => Value + x,
+                    OperatorType.Minus => Value - x,
+                    OperatorType.Exponentiate => Math.Pow(Value, x),
+                    OperatorType.Modulo => Mod(Value, x),
+                    _ => double.NaN
+                };
+
+                return new Real(res);
+            }
+            else if (rhs.Type == TokenType.Integer)
+            {
+                int n = ((Integer)rhs).Value;
+
+                Real token = new Real(n);
+                return ApplyOperation(token, op);
+            }
+        }
+        else
+        {
             double res = op switch
             {
-                OperatorType.Multiply => Value * x,
-                OperatorType.Divide => Value / x,
-                OperatorType.Plus => Value + x,
-                OperatorType.Minus => Value - x,
-                OperatorType.Exponentiate => Math.Pow(Value, x),
-                OperatorType.Modulo => Mod(Value, x),
+                OperatorType.UnaryMinus => -Value,
+                OperatorType.UnaryPlus => Value,
                 _ => double.NaN
             };
 
             return new Real(res);
-        }
-        else if (rhs.Type == TokenType.Integer)
-        {
-            int n = ((Integer)rhs).Value;
-
-            Real token = new Real(n);
-            return ApplyOperation(token, op);
         }
 
         return new Text("Invalid");

@@ -9,7 +9,9 @@ public class InfixToPostfixParser
         { OperatorType.Multiply, 2 },
         { OperatorType.Divide, 2 },
         { OperatorType.Modulo, 2 },
-        { OperatorType.Exponentiate, 3 },
+        { OperatorType.UnaryMinus, 3 },
+        { OperatorType.UnaryPlus, 3 },
+        { OperatorType.Exponentiate, 4 },
     };
 
     public IToken[] Expression = new IToken[] { };
@@ -135,12 +137,13 @@ public class InfixToPostfixParser
     private static void ParseClosingBracket(Stack<IToken> operatorStack, List<IToken> postfix)
     {
         IToken poppedOperator;
-
+        bool isNotOpeningBracket;
         do
         {
             poppedOperator = operatorStack.Pop();
+            isNotOpeningBracket = poppedOperator.Type == TokenType.Operator && ((Operator)poppedOperator).Value != OperatorType.OpeningBracket;
 
-            if (poppedOperator.Type == TokenType.Operator && ((Operator)poppedOperator).Value != OperatorType.OpeningBracket)
+            if (isNotOpeningBracket)
             {
                 postfix.Add(poppedOperator);
 
@@ -149,7 +152,7 @@ public class InfixToPostfixParser
                     postfix.Add(operatorStack.Pop());
                 }
             }
-        } while (poppedOperator.Type != TokenType.Operator && ((Operator)poppedOperator).Value != OperatorType.OpeningBracket);
+        } while (isNotOpeningBracket && operatorStack.Count > 0);
         return;
     }
 }

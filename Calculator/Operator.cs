@@ -28,5 +28,8 @@ public enum OperatorType
     Exponentiate = '^',
     Modulo = '%',
     OpeningBracket = '(',
-    ClosingBracket = ')'
+    ClosingBracket = ')',
+    UnaryPlus,
+    UnaryMinus,
+
 }

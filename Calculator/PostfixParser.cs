@@ -27,10 +27,9 @@ public class PostfixParser
             }
             
             while (
-                OperatorStack.TryPeek(out IToken top) && (
-                    top.Type == TokenType.Function && NumberStack.Count >= 1
-                    || top.Type == TokenType.Operator && NumberStack.Count >= 2
-                    )
+                OperatorStack.TryPeek(out IToken top)
+                && NumberStack.Count > 0
+                && (top.Type == TokenType.Function || top.Type == TokenType.Operator)
                 )
             {
                 IToken popped = OperatorStack.Pop();
@@ -47,12 +46,21 @@ public class PostfixParser
                 {
                     OperatorType op = ((Operator)popped).Value;
 
-                    IToken rhs = NumberStack.Pop();
-                    IToken lhs = NumberStack.Pop();
+                    if (op == OperatorType.UnaryPlus || op == OperatorType.UnaryMinus)
+                    {
+                        IToken lhs = NumberStack.Pop();
 
-                    IToken result = lhs.ApplyOperation(rhs, op);
+                        IToken result = lhs.ApplyOperation(null, op);
+                        NumberStack.Push(result);
+                    }
+                    else if (OperatorStack.Count > 1)
+                    {
+                        IToken rhs = NumberStack.Pop();
+                        IToken lhs = NumberStack.Pop();
 
-                    NumberStack.Push(result);
+                        IToken result = lhs.ApplyOperation(rhs, op);
+                        NumberStack.Push(result);
+                    }
                 }
             }
         }
