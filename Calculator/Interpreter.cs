@@ -4,14 +4,15 @@ public class Interpreter
 {
     public string Command = "";
 
-    public static string[] CommandNames = new string[]
+    public static readonly string[] CommandNames = new string[]
     {
         "numRand",
         "caesarEn",
         "caesarDe",
         "affineEn",
         "affineDe",
-        "isPrime"
+        "isPrime",
+        "vec"
     };
 
     private InfixEvaluator _Evaluator = new InfixEvaluator();
@@ -236,6 +237,24 @@ public class Interpreter
 
                     return NumberTheory.NumCheckDigit(digits);
                 }
+                case "vec":
+                {
+                    Variable @var = (Variable)tokens[1];
+
+                    if (((Operator)tokens[2]).Value != OperatorType.Equals)
+                    {
+                        throw new FormatException();
+                    }
+                    
+                    Real x = (Real)tokens[4];
+                    Real y = (Real)tokens[5];
+                    
+                    Vec2 vec = new Vec2(x.Value, y.Value);
+                    Variables[@var.Name] = vec;
+                    
+                    return vec.ToString();
+                    break;
+                }
                 default:
                 {
                     _Evaluator.Expression = tokens;
@@ -256,7 +275,8 @@ public class Interpreter
             
             return Variables[variable.Name].Output();
         }
-        else if (tokens[0].Type != TokenType.Text)
+        
+        if (tokens[0].Type != TokenType.Text)
         {
             _Evaluator.Expression = tokens;
             return _Evaluator.Evaluate().Output();
