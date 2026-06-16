@@ -123,7 +123,7 @@ public class Interpreter
             if ((tokens[i].Type & TokenType.Operand) != TokenType.Invalid || tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value == OperatorType.ClosingBracket)
             {
                 if (
-                    tokens[i + 1].Type == TokenType.Function
+                    tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Value != "!"
                     || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket)
                 {
                     tokens.Insert(i + 1, multiplication);
