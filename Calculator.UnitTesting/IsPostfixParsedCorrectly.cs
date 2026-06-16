@@ -51,4 +51,19 @@ public class IsPostFixParsedCorrectly
 
         Assert.AreEqual(10000, result.Value);
     }
+    
+    [TestMethod]
+    public void IsUnaryMinusCorrect()
+    {
+        _Parser.Expression = new IToken[]
+        {
+            new Integer(2),
+            new Integer(3),
+            new Operator(OperatorType.UnaryMinus),
+            new Operator(OperatorType.Plus)
+        };
+        Integer result = (Integer)_Parser.Evaluate();
+        
+        Assert.AreEqual(-1, result.Value);
+    }
 }
