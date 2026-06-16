@@ -48,11 +48,12 @@ public class Interpreter
         {
             if (c == ' ' || c == ',')
             {
-                if (currentTokenType == TokenType.Integer)
+                if (currentTokenType == TokenType.Integer || currentTokenType == TokenType.Variable || currentTokenType == TokenType.Real)
                 {
-                    currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
+                    currentTokenData = CompleteToken(ref currentTokenText, ref currentTokenType);
+                    currentTokenType = TokenType.Invalid;
+
                     tokens.Add(currentTokenData);
-                    currentTokenText = "";
                 }
                 if (currentTokenType != TokenType.Text)
                 {
@@ -76,7 +77,7 @@ public class Interpreter
                 {
                     IToken data = ParseTokenText(currentTokenText, currentTokenType);
                     tokens.Add(data);
-                    currentTokenText = "";
+                    
                     continue;
                 }
                 currentCharTokenType = TokenType.Text;
@@ -101,16 +102,10 @@ public class Interpreter
             }
             else if (currentCharTokenType != currentTokenType || currentCharTokenType == TokenType.Operator)
             {
-                if (currentTokenType == TokenType.Variable && (Functions.FunctionNames.Contains(currentTokenText) || CommandNames.Contains(currentTokenText)))
-                {
-                    currentTokenType = TokenType.Function;
-                }
-                
-                currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
-
+                currentTokenData = CompleteToken(ref currentTokenText, ref currentTokenType);
                 tokens.Add(currentTokenData);
+
                 currentTokenType = currentCharTokenType;
-                currentTokenText = "";
             }
             
             if (c != '"')
@@ -190,15 +185,22 @@ public class Interpreter
         return tokens.ToArray();
     }
 
+    private IToken CompleteToken(ref string currentTokenText, ref TokenType currentTokenType)
+    {
+        IToken currentTokenData;
+        if (currentTokenType == TokenType.Variable && (Functions.FunctionNames.Contains(currentTokenText) || CommandNames.Contains(currentTokenText)))
+        {
+            currentTokenType = TokenType.Function;
+        }
+        currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
+        currentTokenText = "";
+
+        return currentTokenData;
+    }
+
     public string Run()
     {
         IToken[] tokens = Tokenise();
-
-        foreach (var token in tokens)
-        {
-            Console.Write(token + " ");
-        }
-        Console.WriteLine();
 
         if (tokens[0].Type == TokenType.Function)
         {
@@ -252,8 +254,7 @@ public class Interpreter
                     Vec2 vec = new Vec2(x.Value, y.Value);
                     Variables[@var.Name] = vec;
                     
-                    return vec.ToString();
-                    break;
+                    return vec.Output();
                 }
                 default:
                 {
