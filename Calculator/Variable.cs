@@ -3,6 +3,11 @@ namespace Calculator;
 public struct Variable: IToken
 {
     public string Name;
+
+    public Variable(string name)
+    {
+        Name = name;
+    }
     
     public TokenType Type => TokenType.Variable;
 

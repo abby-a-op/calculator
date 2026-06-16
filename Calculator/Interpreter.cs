@@ -4,10 +4,20 @@ public class Interpreter
 {
     public string Command = "";
 
+    public static string[] CommandNames = new string[]
+    {
+        "numRand",
+        "caesarEn",
+        "caesarDe",
+        "affineEn",
+        "affineDe",
+        "isPrime"
+    };
+
     private InfixEvaluator _Evaluator = new InfixEvaluator();
 
     const string DIGITS = "0123456789";
-    const string OPERATORS = "+-/*()^%";
+    const string OPERATORS = "+-/*()^%=";
 
     public Dictionary<string, IToken> Variables = new Dictionary<string, IToken>();
 
@@ -20,7 +30,8 @@ public class Interpreter
             TokenType.Operator => new Operator((OperatorType)tokenText[0]),
             TokenType.Function => new Function(tokenText),
             TokenType.Real => new Real(double.Parse(tokenText)),
-            _ => throw new Exception()
+            TokenType.Variable => new Variable(tokenText),
+            _ => throw new ArgumentException("Unable to create token of type " + tokenType)
         };
     }
 
@@ -34,7 +45,7 @@ public class Interpreter
 
         foreach (var c in Command)
         {
-            if (c == ' ')
+            if (c == ' ' || c == ',')
             {
                 if (currentTokenType == TokenType.Integer)
                 {
@@ -89,9 +100,8 @@ public class Interpreter
             }
             else if (currentCharTokenType != currentTokenType || currentCharTokenType == TokenType.Operator)
             {
-                if (currentCharTokenType == TokenType.Variable && Functions.FunctionNames.Contains(currentTokenText))
+                if (currentTokenType == TokenType.Variable && (Functions.FunctionNames.Contains(currentTokenText) || CommandNames.Contains(currentTokenText)))
                 {
-                    currentCharTokenType = TokenType.Function;
                     currentTokenType = TokenType.Function;
                 }
                 
@@ -113,6 +123,8 @@ public class Interpreter
 
         Operator multiplication = new Operator(OperatorType.Multiply);
 
+        // Looks for a place where an implicit multiplication is happening and inserts a multiplication operator
+        // e.g 2(2-3) becomes 2*(2-3)
         for (int i = 0; i < tokens.Count-1; i++)
         {
             if ((tokens[i].Type & TokenType.Operand) == TokenType.Invalid && (tokens[i].Type != TokenType.Operator ||
@@ -121,12 +133,17 @@ public class Interpreter
             {
                 continue;
             }
-            if (tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Value != "!"
-                || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket) {
+            if (tokens[i+1].Type == TokenType.Variable
+                || tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Value != "!"
+                || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket)
+            {
                 tokens.Insert(i + 1, multiplication);
             }
         }
+        
+        // Next two blocks are to allow input of negative numbers by implementing unary operations
 
+        // Checks to see if the first token is a plus or minus, and converts them to the unary equivalent
         if (tokens[0].Type == TokenType.Operator)
         {
             Operator currentToken = (Operator)tokens[0];
@@ -136,6 +153,8 @@ public class Interpreter
             tokens[0] = currentToken;
         }
         
+        // Looks for any places where a plus or minus follows an operator (BUT NOT CLOSING BRACKET, AS LOGICALLY A BRACKET BLOCK IS AN OPERAND)
+        // and replaces the plus or minus with unary equivalent
         for (int i = 0; i < tokens.Count-1; i++)
         {
             if (tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value != OperatorType.ClosingBracket)
@@ -150,6 +169,22 @@ public class Interpreter
                 }
             }
         }
+        
+        // Substitutes value of variables
+        for (int i = 0; i < tokens.Count; i++)
+        {
+            if (tokens[i].Type != TokenType.Variable)
+            {
+                continue;
+            }
+            
+            string variableName = ((Variable)tokens[i]).Name;
+
+            if (Variables.ContainsKey(variableName))
+            {
+                tokens[i] = Variables[variableName];
+            }
+        }
 
         return tokens.ToArray();
     }
@@ -157,6 +192,12 @@ public class Interpreter
     public string Run()
     {
         IToken[] tokens = Tokenise();
+
+        foreach (var token in tokens)
+        {
+            Console.Write(token + " ");
+        }
+        Console.WriteLine();
 
         if (tokens[0].Type == TokenType.Function)
         {
