@@ -31,7 +31,7 @@ public class IsExpressionTokenisedCorrectly
 
         for (int i=0; i<expected.Length; i++)
         {
-            if (expected[i].Type != actual[i].Type || !expected[i].Value.Equals(actual[i].Value))
+            if (expected[i].Type != actual[i].Type || expected[i].Output() != actual[i].Output())
             {
                 return false;
             }
@@ -66,6 +66,25 @@ public class IsExpressionTokenisedCorrectly
             new Integer(2),
             new Operator(OperatorType.Minus),
             new Integer(3),
+            new Operator(OperatorType.ClosingBracket)
+        };
+
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
+    }
+    
+    [TestMethod]
+    public void IsExponentInBracketTokenisedCorrectly()
+    {
+        _interpreter.Command = "10^(53-2)";
+
+        IToken[] expected = new IToken[]
+        {
+            new Integer(10),
+            new Operator(OperatorType.Exponentiate),
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(53),
+            new Operator(OperatorType.Minus),
+            new Integer(2),
             new Operator(OperatorType.ClosingBracket)
         };
 

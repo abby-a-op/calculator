@@ -30,7 +30,7 @@ public class IsInfixParsedCorrectly
 
         for (int i=0; i<expected.Length; i++)
         {
-            if (expected[i].Type != actual[i].Type || !expected[i].Value.Equals(actual[i].Value))
+            if (expected[i].Type != actual[i].Type || expected[i].Output() != actual[i].Output())
             {
                 return false;
             }
@@ -59,6 +59,32 @@ public class IsInfixParsedCorrectly
         bool isEqual = ExpressionEqual(_parser.Parse(), expectedOutput);
 
         Assert.IsTrue(isEqual);
+    }
+
+    [TestMethod]
+    public void IsExponentInBracketParsedCorrectly()
+    {
+        _parser.Expression = new IToken[]
+        {
+            new Integer(10),
+            new Operator(OperatorType.Exponentiate),
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(53),
+            new Operator(OperatorType.Minus),
+            new Integer(2),
+            new Operator(OperatorType.ClosingBracket)
+        };
+
+        IToken[] expected = new IToken[]
+        {
+            new Integer(10),
+            new Integer(53),
+            new Integer(2),
+            new Operator(OperatorType.Minus),
+            new Operator(OperatorType.Exponentiate)
+        };
+
+        Assert.IsTrue(ExpressionEqual(expected, _parser.Parse()));
     }
 
     [TestMethod]
