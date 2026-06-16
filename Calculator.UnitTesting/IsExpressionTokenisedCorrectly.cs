@@ -171,11 +171,8 @@ public class IsExpressionTokenisedCorrectly
         {
             new Integer(2),
             new Operator(OperatorType.Divide),
-            new Operator(OperatorType.OpeningBracket),
-            new Integer(0),
-            new Operator(OperatorType.Minus),
-            new Integer(3),
-            new Operator(OperatorType.ClosingBracket)
+            new Operator(OperatorType.UnaryMinus),
+            new Integer(3)
         };
 
         Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
