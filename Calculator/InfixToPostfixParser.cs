@@ -25,7 +25,7 @@ public class InfixToPostfixParser
         foreach (IToken token in Expression)
         {
             // Numbers are added directly to the expression
-            if (token.Type == TokenType.Integer || token.Type == TokenType.Real)
+            if (token.Type == TokenType.Integer)
             {
                 postfix.Add(token);
                 continue;
@@ -140,7 +140,7 @@ public class InfixToPostfixParser
         {
             poppedOperator = operatorStack.Pop();
 
-            if (poppedOperator.Type == TokenType.Operator && ((Operator)poppedOperator).Value != OperatorType.ClosingBracket)
+            if (poppedOperator.Type == TokenType.Operator && ((Operator)poppedOperator).Value != OperatorType.OpeningBracket)
             {
                 postfix.Add(poppedOperator);
 
