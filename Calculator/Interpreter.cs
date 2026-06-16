@@ -1,5 +1,3 @@
-using System.Net.Sockets;
-
 namespace Calculator;
 
 public class Interpreter
@@ -34,10 +32,8 @@ public class Interpreter
 
         IToken currentTokenData;
 
-        for (int i=0; i<Command.Length; i++)
+        foreach (var c in Command)
         {
-            char c = Command[i];
-
             if (c == ' ')
             {
                 if (currentTokenType == TokenType.Integer)
@@ -56,14 +52,7 @@ public class Interpreter
 
             if (DIGITS.Contains(c))
             {
-                if (currentTokenType == TokenType.Real)
-                {
-                    currentCharTokenType = TokenType.Real;
-                }
-                else
-                {
-                    currentCharTokenType = TokenType.Integer;
-                }
+                currentCharTokenType = currentTokenType == TokenType.Real ? TokenType.Real : TokenType.Integer;
             }
             else if (OPERATORS.Contains(c))
             {
@@ -91,7 +80,7 @@ public class Interpreter
             }
             else
             {
-                currentCharTokenType = TokenType.Function;
+                currentCharTokenType = TokenType.Variable;
             }
             
             if (currentTokenType == TokenType.Invalid)
@@ -100,6 +89,12 @@ public class Interpreter
             }
             else if (currentCharTokenType != currentTokenType || currentCharTokenType == TokenType.Operator)
             {
+                if (currentCharTokenType == TokenType.Variable && Functions.FunctionNames.Contains(currentTokenText))
+                {
+                    currentCharTokenType = TokenType.Function;
+                    currentTokenType = TokenType.Function;
+                }
+                
                 currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
 
                 tokens.Add(currentTokenData);
@@ -120,14 +115,15 @@ public class Interpreter
 
         for (int i = 0; i < tokens.Count-1; i++)
         {
-            if ((tokens[i].Type & TokenType.Operand) != TokenType.Invalid || tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value == OperatorType.ClosingBracket)
+            if ((tokens[i].Type & TokenType.Operand) == TokenType.Invalid && (tokens[i].Type != TokenType.Operator ||
+                                                                              ((Operator)tokens[i]).Value !=
+                                                                              OperatorType.ClosingBracket))
             {
-                if (
-                    tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Value != "!"
-                    || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket)
-                {
-                    tokens.Insert(i + 1, multiplication);
-                }
+                continue;
+            }
+            if (tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Value != "!"
+                || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket) {
+                tokens.Insert(i + 1, multiplication);
             }
         }
 
@@ -185,7 +181,7 @@ public class Interpreter
                     c = ((Integer)tokens[3]).Value;
                     m = ((Integer)tokens[4]).Value;
 
-                    return NumberTheory.NumRand(a, x, c, m).ToString();
+                    return NumberTheory.NumRand(a, x, c, m);
                 }
                 case "isPrime":
                 {
@@ -197,7 +193,7 @@ public class Interpreter
                 {
                     string digits = ((Integer)tokens[1]).Output();
 
-                    return NumberTheory.NumCheckDigit(digits).ToString();
+                    return NumberTheory.NumCheckDigit(digits);
                 }
                 default:
                 {
@@ -205,6 +201,19 @@ public class Interpreter
                     return _Evaluator.Evaluate().Output();
                 }
             }
+        }
+        
+        if (tokens[0].Type == TokenType.Variable && tokens[1].Type == TokenType.Operator && ((Operator)tokens[1]).Value == OperatorType.Equals)
+        {
+            Variable variable = (Variable)tokens[0];
+            
+            IToken[] expressionForVariable = new IToken[tokens.Length - 2];
+            Array.Copy(tokens, 2, expressionForVariable, 0, expressionForVariable.Length);
+            _Evaluator.Expression = tokens;
+            
+            Variables[variable.Name] = _Evaluator.Evaluate();
+            
+            return Variables[variable.Name].Output();
         }
         else if (tokens[0].Type != TokenType.Text)
         {

@@ -15,14 +15,6 @@ public struct Function: IToken
 
     public IToken ApplyOperation(IToken rhs, OperatorType op)
     {
-        if (rhs.Type == TokenType.Text)
-        {
-            string a = Value;
-            string b = ((Function)rhs).Value;
-
-            return new Function(a+b);
-        }
-
         throw new InvalidOperationException($"{Type} {(char)op} {rhs.Type} is invalid");
     }
 }

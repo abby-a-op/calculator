@@ -12,6 +12,12 @@ public static class Functions
         };
     }
 
+    public static readonly string[] FunctionNames = new string[]
+    {
+        "!",
+        "sqrt"
+    };
+
     public static IToken Factorial(IToken input)
     {
         int n;
