@@ -62,6 +62,30 @@ public class IsInfixParsedCorrectly
     }
 
     [TestMethod]
+    public void IsStackingUnaryOperationsParsedCorrectly()
+    {
+        _parser.Expression = new IToken[]
+        {
+            new Integer(2),
+            new Operator(OperatorType.Minus),
+            new Operator(OperatorType.UnaryMinus),
+            new Operator(OperatorType.UnaryMinus),
+            new Integer(3),
+        };
+
+        IToken[] expected = new IToken[]
+        {
+            new Integer(2),
+            new Integer(3),
+            new Operator(OperatorType.UnaryMinus),
+            new Operator(OperatorType.UnaryMinus),
+            new Operator(OperatorType.Minus)
+        };
+
+        Assert.IsTrue(ExpressionEqual(expected, _parser.Parse()));
+    }
+
+    [TestMethod]
     public void IsExponentInBracketParsedCorrectly()
     {
         _parser.Expression = new IToken[]

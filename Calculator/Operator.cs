@@ -29,7 +29,7 @@ public enum OperatorType
     Modulo = '%',
     OpeningBracket = '(',
     ClosingBracket = ')',
-    UnaryPlus,
-    UnaryMinus,
+    UnaryPlus = '$',
+    UnaryMinus = '@',
 
 }

@@ -53,7 +53,7 @@ public class PostfixParser
                         IToken result = lhs.ApplyOperation(null, op);
                         NumberStack.Push(result);
                     }
-                    else if (OperatorStack.Count > 1)
+                    else if (NumberStack.Count > 1)
                     {
                         IToken rhs = NumberStack.Pop();
                         IToken lhs = NumberStack.Pop();

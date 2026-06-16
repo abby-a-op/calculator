@@ -117,7 +117,6 @@ public class Interpreter
         tokens.Add(currentTokenData);
 
         Operator multiplication = new Operator(OperatorType.Multiply);
-        Integer zero = new Integer(0);
 
         for (int i = 0; i < tokens.Count-1; i++)
         {
@@ -137,10 +136,10 @@ public class Interpreter
             Operator currentToken = (Operator)tokens[0];
             if (currentToken.Value == OperatorType.Plus) currentToken.Value = OperatorType.UnaryPlus;
             if (currentToken.Value == OperatorType.Minus) currentToken.Value = OperatorType.UnaryMinus;
-
+        
             tokens[0] = currentToken;
         }
-
+        
         for (int i = 0; i < tokens.Count-1; i++)
         {
             if (tokens[i].Type == TokenType.Operator && ((Operator)tokens[i]).Value != OperatorType.ClosingBracket)
@@ -150,7 +149,7 @@ public class Interpreter
                     Operator currentToken = (Operator)tokens[i+1];
                     if (currentToken.Value == OperatorType.Plus) currentToken.Value = OperatorType.UnaryPlus;
                     if (currentToken.Value == OperatorType.Minus) currentToken.Value = OperatorType.UnaryMinus;
-
+        
                     tokens[i+1] = currentToken;
                 }
             }

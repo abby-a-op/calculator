@@ -14,6 +14,13 @@ public class InfixToPostfixParser
         { OperatorType.Exponentiate, 4 },
     };
 
+    private static OperatorType[] RightAssociativeOperators = new OperatorType[]
+    {
+        OperatorType.Exponentiate,
+        OperatorType.UnaryMinus,
+        OperatorType.UnaryPlus
+    };
+
     public IToken[] Expression = new IToken[] { };
 
     // Implementation of Shunting Yard Algorithm (Reference: https://mathcenter.oxford.emory.edu/site/cs171/shuntingYardAlgorithm)
@@ -81,10 +88,12 @@ public class InfixToPostfixParser
 
                         int currentPrecedence = OperatorPrecedence[operatorToken.Value];
                         int topPrecedence = OperatorPrecedence[nextOperator.Value];
+                        
+                        bool isRightAssociative = RightAssociativeOperators.Contains(nextOperator.Value);
 
                         if (
                             currentPrecedence > topPrecedence
-                            || currentPrecedence == topPrecedence && operatorToken.Value == OperatorType.Exponentiate
+                            || currentPrecedence == topPrecedence && isRightAssociative
                             )
                         {
                             operatorStack.Push(token);
@@ -93,7 +102,7 @@ public class InfixToPostfixParser
 
                         if (
                             currentPrecedence < topPrecedence
-                            || currentPrecedence == topPrecedence && operatorToken.Value != OperatorType.Exponentiate
+                            || currentPrecedence == topPrecedence && !isRightAssociative
                         )
                         {
                             ParseLowerPrecedence(operatorStack, postfix, operatorToken, currentPrecedence, topPrecedence);
