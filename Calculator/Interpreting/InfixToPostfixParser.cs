@@ -34,7 +34,7 @@ public class InfixToPostfixParser
         foreach (IToken token in Expression)
         {
             // Numbers are added directly to the expression
-            if ((token.Type & TokenType.Operand) != TokenType.Invalid)
+            if ((token.Type & TokenType.Operand) != TokenType.Undefined)
             {
                 postfix.Add(token);
                 continue;

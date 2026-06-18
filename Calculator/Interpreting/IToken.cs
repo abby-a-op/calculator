@@ -12,7 +12,7 @@ public interface IToken
 [Flags]
 public enum TokenType
 {
-    Invalid = 0,
+    Undefined = 0,
     Real = 1,
     Operator = 2,
     Function = 4,
@@ -21,5 +21,5 @@ public enum TokenType
     Integer = 32,
     Vec2 = 64,
     Matrix = 128,
-    Operand = Integer | Real | Vec2 | Variable
+    Operand = Integer | Real | Vec2 | Variable | Matrix
 }

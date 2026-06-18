@@ -17,7 +17,7 @@ public class PostfixParser
 
         foreach (IToken token in Expression)
         {
-            if ((token.Type & TokenType.Operand) != TokenType.Invalid)
+            if ((token.Type & TokenType.Operand) != TokenType.Undefined)
             {
                 NumberStack.Push(token);
             }

@@ -40,42 +40,53 @@ public class Interpreter
         };
     }
 
+    // Breaks up the user's input into the various "tokens" and describes the type of them
+    // For example, "2+2!" becomes 2 (Integer), Plus (Operator), 2 (Integer), ! (Function).
+    // An explicit tokenisation method was necessary as a raw string has very little semantic information,
+    // and would make it difficult to tell when a number ends and an operator begins
     public IToken[] Tokenise()
     {
         List<IToken> tokens = new List<IToken>();
+
+        // The text for the current token. Parsed when a new token starts
         string currentTokenText = "";
-        TokenType currentTokenType = TokenType.Invalid;
+
+        // At the first iteration, the
+        TokenType currentTokenType = TokenType.Undefined;
 
         IToken currentTokenData;
 
+        // Iterates through characters in the command
         foreach (var c in Command)
         {
+            // Spaces between operators should be ignored
             if (c == ' ' || c == ',')
             {
-                if (currentTokenType == TokenType.Integer || currentTokenType == TokenType.Variable || currentTokenType == TokenType.Real)
+                // If the current token is an operand, a space after means the token is complete and the next iteration should begin
+                if ((currentTokenType & TokenType.Operand) != TokenType.Undefined)
                 {
                     currentTokenData = CompleteToken(ref currentTokenText, ref currentTokenType);
-                    currentTokenType = TokenType.Invalid;
-
                     tokens.Add(currentTokenData);
+
+                    // As the type of the next token has not been determined yet, set it to undefined
+                    currentTokenType = TokenType.Undefined;
                 }
-                if (currentTokenType != TokenType.Text)
+
+                // If the current token is text, add the character
+                else if (currentTokenType == TokenType.Text)
                 {
-                    continue;
+                    currentTokenText += c;
                 }
+
+                continue;
             }
 
+            // The token type that corresponds to the current character
+            // If the current character's type is different to the current token's, a new token has started
             TokenType currentCharTokenType;
 
-            if (DIGITS.Contains(c))
-            {
-                currentCharTokenType = currentTokenType == TokenType.Real ? TokenType.Real : TokenType.Integer;
-            }
-            else if (OPERATORS.Contains(c))
-            {
-                currentCharTokenType = TokenType.Operator;
-            }
-            else if (c == '"')
+            // Double quotes means start of text, but if the current token is already text, it signifies the end of the token
+            if (c == '"')
             {
                 if (currentTokenType == TokenType.Text)
                 {
@@ -84,26 +95,48 @@ public class Interpreter
                     
                     continue;
                 }
+                else
+                {
+                    currentCharTokenType = TokenType.Text;
+                }
+            }
+            // If the current token is text and the new character isn't double quotes, the token has not ended
+            else if (currentTokenType == TokenType.Text)
+            {
                 currentCharTokenType = TokenType.Text;
             }
+            else if (DIGITS.Contains(c))
+            {
+                // If the interpreter has seen a decimal place in the current token, the token type is a real
+                // If it hasn't, it's an integer
+                currentCharTokenType = currentTokenType == TokenType.Real ? TokenType.Real : TokenType.Integer;
+            }
+            else if (OPERATORS.Contains(c))
+            {
+                currentCharTokenType = TokenType.Operator;
+            }
+            // A decimal point in a number means the number is a real, so the token type is changed
             else if (c == '.' && currentTokenType == TokenType.Integer)
             {
                 currentTokenType = TokenType.Real;
                 currentCharTokenType = TokenType.Real;
             }
-            else if (currentTokenType == TokenType.Text)
-            {
-                currentCharTokenType = TokenType.Text;
-            }
+
+            // For every other case, assume it is a variable (functions are determined as the token text is parsed)
             else
             {
                 currentCharTokenType = TokenType.Variable;
             }
             
-            if (currentTokenType == TokenType.Invalid)
+            // If the token type is currently unset, it is the start of a new token,
+            // so set the current token type to the current character
+            if (currentTokenType == TokenType.Undefined)
             {
                 currentTokenType = currentCharTokenType;
             }
+
+            // If a new token has started, parse the current token and add it to the list
+            // The new token will have the type of the current character
             else if (currentCharTokenType != currentTokenType || currentCharTokenType == TokenType.Operator)
             {
                 currentTokenData = CompleteToken(ref currentTokenText, ref currentTokenType);
@@ -112,22 +145,22 @@ public class Interpreter
                 currentTokenType = currentCharTokenType;
             }
             
+            // For every character other than a double quote, add the current character to the token text
             if (c != '"')
             {
                 currentTokenText += c;
             }
         }
 
-        currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
+        // Parses the last token
+        currentTokenData = CompleteToken(ref currentTokenText, ref currentTokenType);
         tokens.Add(currentTokenData);
-
-        Operator multiplication = new Operator(OperatorType.Multiply);
 
         // Looks for a place where an implicit multiplication is happening and inserts a multiplication operator
         // e.g 2(2-3) becomes 2*(2-3)
         for (int i = 0; i < tokens.Count-1; i++)
         {
-            if ((tokens[i].Type & TokenType.Operand) == TokenType.Invalid && (tokens[i].Type != TokenType.Operator ||
+            if ((tokens[i].Type & TokenType.Operand) == TokenType.Undefined && (tokens[i].Type != TokenType.Operator ||
                                                                               ((Operator)tokens[i]).Value !=
                                                                               OperatorType.ClosingBracket))
             {
@@ -137,7 +170,7 @@ public class Interpreter
                 || tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Value != "!"
                 || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket)
             {
-                tokens.Insert(i + 1, multiplication);
+                tokens.Insert(i + 1, new Operator(OperatorType.Multiply));
             }
         }
         
@@ -192,8 +225,9 @@ public class Interpreter
     private IToken CompleteToken(ref string currentTokenText, ref TokenType currentTokenType)
     {
         IToken currentTokenData;
+
         if (currentTokenType == TokenType.Variable && (Functions.FunctionNames.Contains(currentTokenText) || CommandNames.Contains(currentTokenText)))
-        {
+        {            
             currentTokenType = TokenType.Function;
         }
         currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
