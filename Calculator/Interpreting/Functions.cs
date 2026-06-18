@@ -20,17 +20,25 @@ public static class Functions
 
     public static IToken Factorial(IToken input)
     {
-        int n;
         if (input.Type == TokenType.Integer)
         {
-            n = ((Integer)input).Value;
+            int n = ((Integer)input).Value;
 
             Integer output = new Integer();
             output.Value = Factorial(n);
             return output;
         }
 
-        return new Text("Invalid type for factorial");
+        else if (input.Type == TokenType.Real)
+        {
+            double x = ((Real)input).Value;
+
+            Integer output = new Integer();
+            output.Value = Factorial((int)x);
+            return output;
+        }
+
+        throw new InvalidOperationException("Cannot take factorial of " + input.Type);
     }
 
     static int Factorial(int n)
@@ -56,6 +64,12 @@ public static class Functions
             return new Integer((int)Math.Sqrt(n));
         }
         
-        return new Text("Invalid");
+        if (input.Type == TokenType.Real)
+        {
+            double x = ((Real)input).Value;
+            return new Real(x);
+        }
+
+        throw new InvalidOperationException("Cannot take square root of " + input.Type);
     }
 }

@@ -308,7 +308,7 @@ public class Interpreter
                     Vec2 a = (Vec2)tokens[1];
                     Vec2 b = (Vec2)tokens[2];
 
-                    return a.Dot(b).ToString();
+                    return a.Dot(b).Output();
                 }
                 case "scalVec":
                 {

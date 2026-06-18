@@ -26,7 +26,7 @@ public class Real: IToken
                     OperatorType.Minus => Value - x,
                     OperatorType.Exponentiate => Math.Pow(Value, x),
                     OperatorType.Modulo => Mod(Value, x),
-                    _ => double.NaN
+                    _ => throw new InvalidOperationException($"Operation {op} is unvalid for two reals")
                 };
 
                 return new Real(res);
@@ -45,13 +45,13 @@ public class Real: IToken
             {
                 OperatorType.UnaryMinus => -Value,
                 OperatorType.UnaryPlus => Value,
-                _ => double.NaN
+                _ => throw new InvalidOperationException($"Operator {op} is not valid for a single Real")
             };
 
             return new Real(res);
         }
 
-        return new Text("Invalid");
+        throw new InvalidOperationException($"Operator {op} is not valid for Real and {rhs.Type}");
     }
 
     static double Mod(double a, double b)
