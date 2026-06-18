@@ -17,6 +17,11 @@ public struct Vec2: IToken
         return new Vec2(X + b.X, Y + b.Y);
     }
 
+    public Vec2 UnaryMinus()
+    {
+        return new Vec2(-X, -Y);
+    }
+
     public Vec2 Minus(Vec2 b)
     {
         return new Vec2(X - b.X, Y - b.Y);
@@ -27,18 +32,28 @@ public struct Vec2: IToken
         return new Vec2(X * s, Y * s);
     }
 
-    public double Dot(Vec2 b)
+    public Real Dot(Vec2 b)
     {
-        return X * b.X + Y * b.Y;
+        return new Real(X * b.X + Y * b.Y);
     }
 
-    public double Length()
+    public Real Length()
     {
-        return Math.Sqrt(X*X + Y*Y);
+        return (Real)Functions.Sqrt(new Real(X*X + Y*Y));
     }
 
-    public IToken ApplyOperation(IToken rhs, OperatorType op)
+    public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
+        if (rhs == null)
+        {
+            return op switch
+            {
+                OperatorType.UnaryPlus => this,
+                OperatorType.UnaryMinus => UnaryMinus(),
+                _ => throw new InvalidOperationException($"Operation {op} is not valid on Vec2")
+            };
+        }
+
         if (rhs.Type == TokenType.Vec2)
         {
             Vec2 b = (Vec2)rhs;
@@ -47,11 +62,12 @@ public struct Vec2: IToken
             {
                 OperatorType.Plus => Add(b),
                 OperatorType.Minus => Minus(b),
-                _ => new Text("Invalid")
+                _ => throw new InvalidOperationException($"Operation {op} is not valid on Vec2")
+
             };
         }
 
-        return new Text("Invalid");
+        throw new InvalidOperationException($"Operation {op} is not valid on Vec2");
     }
 
     public string Output() => $"({X}, {Y})";

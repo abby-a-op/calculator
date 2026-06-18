@@ -27,7 +27,7 @@ public class PostfixParser
             }
             
             while (
-                OperatorStack.TryPeek(out IToken top)
+                OperatorStack.TryPeek(out IToken? top)
                 && NumberStack.Count > 0
                 && (top.Type == TokenType.Function || top.Type == TokenType.Operator)
                 )

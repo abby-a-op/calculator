@@ -156,7 +156,7 @@ public class InfixToPostfixParser
             {
                 postfix.Add(poppedOperator);
 
-                if (operatorStack.TryPeek(out IToken topToken) && topToken.Type == TokenType.Function)
+                if (operatorStack.TryPeek(out IToken? topToken) && topToken.Type == TokenType.Function)
                 {
                     postfix.Add(operatorStack.Pop());
                 }

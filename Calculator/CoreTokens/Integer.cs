@@ -13,7 +13,16 @@ public struct Integer: IToken
 
     public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
-        if (rhs != null)
+        if (rhs == null)
+        {
+            return op switch
+            {
+                OperatorType.UnaryPlus => new Integer(Value),
+                OperatorType.UnaryMinus => new Integer(-Value),
+                _ => throw new InvalidOperationException($"Operator {op} is not valid for one integer")
+            };
+        }
+        else
         {
             if (rhs.Type == TokenType.Integer)
             {
@@ -27,21 +36,19 @@ public struct Integer: IToken
 
                 if (op == OperatorType.Exponentiate && a == 0 && b == 0)
                 {
-                    throw new ArithmeticException();
+                    throw new ArithmeticException("0^0 is undefined");
                 }
 
-                int result = op switch
+                return op switch
                 {
-                    OperatorType.Plus => a+b,
-                    OperatorType.Minus => a-b,
-                    OperatorType.Multiply => a*b,
-                    OperatorType.Divide => a/b,
-                    OperatorType.Exponentiate => (int)Math.Pow(a, b),
-                    OperatorType.Modulo => Mod(a, b),
-                    _ => -1
+                    OperatorType.Plus => new Integer(a+b),
+                    OperatorType.Minus => new Integer(a-b),
+                    OperatorType.Multiply => new Integer(a*b),
+                    OperatorType.Divide => new Integer(a/b),
+                    OperatorType.Exponentiate => new Integer((int)Math.Pow(a, b)),
+                    OperatorType.Modulo => new Integer(Mod(a, b)),
+                    _ => throw new InvalidOperationException($"Operator {op} is not valid for two ints")
                 };
-
-                return new Integer(result);
             }
             else if (rhs.Type == TokenType.Real)
             {
@@ -50,19 +57,8 @@ public struct Integer: IToken
                 return castToReal.ApplyOperation(rhs, op);
             }
         }
-        else
-        {
-            int result = op switch
-            {
-                OperatorType.UnaryMinus => -Value,
-                OperatorType.UnaryPlus => Value,
-                _ => throw new InvalidOperationException()
-            };
 
-            return new Integer(result);
-        }
-
-        return new Text("Invalid");
+        throw new InvalidOperationException($"Operation {op} is invalid for Integer and {rhs.Type}");
     }
 
     private int Mod(int a, int b)

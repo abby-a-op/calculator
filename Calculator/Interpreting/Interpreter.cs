@@ -35,7 +35,7 @@ public class Interpreter
             TokenType.Operator => new Operator((OperatorType)tokenText[0]),
             TokenType.Function => new Function(tokenText),
             TokenType.Real => new Real(double.Parse(tokenText)),
-            TokenType.Variable => new Variable(tokenText),
+            TokenType.Variable => new Variable(tokenText, Variables),
             _ => throw new ArgumentException("Unable to create token of type " + tokenType)
         };
     }
@@ -206,12 +206,6 @@ public class Interpreter
     {
         IToken[] tokens = Tokenise();
 
-        foreach (var token in tokens)
-        {
-            Console.Write($"{token.Output()} ({token.Type}) ");
-        }
-        Console.WriteLine();
-
         if (tokens[0].Type == TokenType.Function)
         {
             switch (((Function)tokens[0]).Value)
@@ -297,18 +291,18 @@ public class Interpreter
             }
         }
         
-        if (tokens[0].Type == TokenType.Variable && tokens[1].Type == TokenType.Operator && ((Operator)tokens[1]).Value == OperatorType.Equals)
-        {
-            Variable variable = (Variable)tokens[0];
+        // if (tokens[0].Type == TokenType.Variable && tokens[1].Type == TokenType.Operator && ((Operator)tokens[1]).Value == OperatorType.Equals)
+        // {
+        //     Variable variable = (Variable)tokens[0];
             
-            IToken[] expressionForVariable = new IToken[tokens.Length - 2];
-            Array.Copy(tokens, 2, expressionForVariable, 0, expressionForVariable.Length);
-            _Evaluator.Expression = tokens;
+        //     IToken[] expressionForVariable = new IToken[tokens.Length - 2];
+        //     Array.Copy(tokens, 2, expressionForVariable, 0, expressionForVariable.Length);
+        //     _Evaluator.Expression = tokens;
             
-            Variables[variable.Name] = _Evaluator.Evaluate();
+        //     Variables[variable.Name] = _Evaluator.Evaluate();
             
-            return Variables[variable.Name].Output();
-        }
+        //     return Variables[variable.Name].Output();
+        // }
         
         if (tokens[0].Type != TokenType.Text)
         {

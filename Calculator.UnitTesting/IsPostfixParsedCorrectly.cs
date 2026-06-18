@@ -66,4 +66,20 @@ public class IsPostFixParsedCorrectly
         
         Assert.AreEqual(-1, result.Value);
     }
+
+    [TestMethod]
+    public void IsFunctionParsedCorrectly()
+    {
+        _Parser.Expression = new IToken[]
+        {
+            new Integer(2),
+            new Integer(3),
+            new Function("!"),
+            new Operator(OperatorType.Plus)
+        };
+
+        Integer result = (Integer)_Parser.Evaluate();
+
+        Assert.AreEqual(8, result.Value);
+    }
 }

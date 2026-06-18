@@ -11,7 +11,7 @@ public struct Operator: IToken
         Value = value;
     }
 
-    public IToken ApplyOperation(IToken rhs, OperatorType op)
+    public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
         throw new InvalidOperationException("Cannot perform operation between two operations");
     }

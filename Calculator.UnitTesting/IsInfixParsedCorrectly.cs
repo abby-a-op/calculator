@@ -172,6 +172,28 @@ public class IsInfixParsedCorrectly
     }
 
     [TestMethod]
+    public void IsFactorialParsedCorrectly()
+    {
+        _parser.Expression = new IToken[]
+        {
+            new Integer(2),
+            new Function("!"),
+            new Operator(OperatorType.Exponentiate),
+            new Integer(3)
+        };
+
+        IToken[] expected = new IToken[]
+        {
+            new Integer(2),
+            new Function("!"),
+            new Integer(3),
+            new Operator(OperatorType.Exponentiate)
+        };
+        
+        Assert.IsTrue(ExpressionEqual(expected, _parser.Parse()));
+    }
+
+    [TestMethod]
     public void IsMultiplicationAtEndOfBrackedParsedCorrectly()
     {
         _parser.Expression = new IToken[]

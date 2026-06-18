@@ -13,8 +13,8 @@ public struct Function: IToken
 
     public string Output() => Value;
 
-    public IToken ApplyOperation(IToken rhs, OperatorType op)
+    public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
-        throw new InvalidOperationException($"{Type} {(char)op} {rhs.Type} is invalid");
+        throw new InvalidOperationException($"Operator {op} is invalid on functions");
     }
 }

@@ -15,9 +15,11 @@ public struct Text: IToken
 
     public string Output() => Value;
 
-    public IToken ApplyOperation(IToken rhs, OperatorType op)
+    public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
-        if (rhs.Type == TokenType.Text)
+        if (rhs == null) throw new InvalidOperationException($"Operation {op} is invalid on text");
+
+        if (rhs.Type == TokenType.Text && op == OperatorType.Plus)
         {
             string a = Value;
             string b = ((Text)rhs).Value;
@@ -25,6 +27,6 @@ public struct Text: IToken
             return new Text(a+b);
         }
 
-        throw new InvalidOperationException($"{Type} {(char)op} {rhs.Type} is invalid");
+        throw new InvalidOperationException($"Operation {op} is invalid on text");
     }
 }
