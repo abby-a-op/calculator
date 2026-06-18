@@ -11,5 +11,6 @@ public enum TokenType
     Variable = 16,
     Integer = 32,
     Vec2 = 64,
+    Matrix = 128,
     Operand = Integer | Real | Vec2,
 }
