@@ -12,7 +12,11 @@ public class Interpreter
         "affineEn",
         "affineDe",
         "isPrime",
-        "vec"
+        "vec",
+        "addVec",
+        "subVec",
+        "scalVec",
+        "dotVec"
     };
 
     private InfixEvaluator _Evaluator = new InfixEvaluator();
@@ -202,6 +206,12 @@ public class Interpreter
     {
         IToken[] tokens = Tokenise();
 
+        foreach (var token in tokens)
+        {
+            Console.Write($"{token.Output()} ({token.Type}) ");
+        }
+        Console.WriteLine();
+
         if (tokens[0].Type == TokenType.Function)
         {
             switch (((Function)tokens[0]).Value)
@@ -242,19 +252,42 @@ public class Interpreter
                 case "vec":
                 {
                     Variable @var = (Variable)tokens[1];
-
-                    if (((Operator)tokens[2]).Value != OperatorType.Equals)
-                    {
-                        throw new FormatException();
-                    }
                     
-                    Real x = (Real)tokens[4];
-                    Real y = (Real)tokens[5];
+                    Real x = (Real)tokens[3];
+                    Real y = (Real)tokens[4];
                     
                     Vec2 vec = new Vec2(x.Value, y.Value);
                     Variables[@var.Name] = vec;
                     
                     return vec.Output();
+                }
+                case "addVec":
+                {
+                    Vec2 a = (Vec2)tokens[1];
+                    Vec2 b = (Vec2)tokens[2];
+
+                    return a.Add(b).Output();
+                }
+                case "subVec":
+                {
+                    Vec2 a = (Vec2)tokens[1];
+                    Vec2 b = (Vec2)tokens[2];
+
+                    return a.Minus(b).Output();
+                }
+                case "dotVec":
+                {
+                    Vec2 a = (Vec2)tokens[1];
+                    Vec2 b = (Vec2)tokens[2];
+
+                    return a.Dot(b).ToString();
+                }
+                case "scalVec":
+                {
+                    Real s = (Real)tokens[1];
+                    Vec2 a = (Vec2)tokens[2];
+
+                    return a.Scale(s.Value).Output();
                 }
                 default:
                 {
