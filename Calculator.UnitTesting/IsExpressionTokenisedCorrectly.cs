@@ -41,6 +41,20 @@ public class IsExpressionTokenisedCorrectly
     }
 
     [TestMethod]
+    public void IsFactorialParsedCorrectly()
+    {
+        _interpreter.Command = "2!";
+
+        IToken[] expected = new IToken[]
+        {
+            new Integer(2),
+            new Function("!")
+        };
+
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
+    }
+
+    [TestMethod]
     public void AreAllOperatorsTokenisedCorrectly()
     {
         _interpreter.Command = "2+3-3*2%2!^2*2*(2-3)";
