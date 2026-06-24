@@ -38,15 +38,26 @@ public class Interpreter
     Basic usage - Enter any basic mathematical expression to get the result.
 
     Commands:
-    numRand (int a) (int X) (int c) (int m) - Generates a random number using the linear congruential method
-    numPrime (int a) - Returns true if a number less than or equal to 10000 is prime
-    numCheckDigit (int digits) - Returns a complete barcode number for UPC, EAN-13, or ISBN barcodes
-    
-    caesarEn (text plaintext) - Returns a string encoded with the ROT-3 Caesar cipher
-    caesarDe (text ciphertext) - Decodes a string encoded with the ROT-3 Caesar cipher
+    ------------Geometry and vectors-----------
+    vec [name] ([real x], [real y]) - Creates a 2D vector and stores it under a
+    addVec [vector a] [vector b] - Adds two 2D vectors together (equivilent to a+b)
+    subVec [vector a] [vector b] - Subtracts two 2D vectors
+    dotVec [vector a] [vector b] - Calculates the dot product of two 2D vectors
+    scalVec [real s] [vector a] - Scales a vector by scalar s
 
-    affineEn (int a) (int b) (string plaintext) - Encrypts a string with the affine cipher, using a and b as the keys
-    affineDe (int a) (int b) (string ciphertext) - Decrypts a string with the affine cipher, using a and b as the keys
+    TODO: LINES AND MATRICES
+
+    -------Number theory and encryption--------
+    numRand [int a] [int X] [int c] [int m] - Generates a random number using the linear congruential method
+    numPrime [int a] - Returns true if a number less than or equal to 10000 is prime
+    numCheckDigit [int digits] - Returns a complete barcode number for UPC, EAN-13, or ISBN barcodes
+    
+    caesarEn [text plaintext] - Returns a string encoded with the ROT-3 Caesar cipher
+    caesarDe [text ciphertext] - Decodes a string encoded with the ROT-3 Caesar cipher
+
+    affineEn [int a] [int b] [string plaintext] - Encrypts a string with the affine cipher, using a and b as the keys
+    affineDe [int a] [int b] [string ciphertext] - Decrypts a string with the affine cipher, using a and b as the keys
+    bruteAffine [string ciphertext] - Outputs all possible plaintext strings for a given ciphertext, including the keys
     """;
 
     private InfixEvaluator _Evaluator = new InfixEvaluator();
