@@ -6,6 +6,8 @@ public interface IToken
 
     public TokenType Type { get; }
 
+    public IToken CastTo(TokenType castTo);
+
     public string Output();
 }
 

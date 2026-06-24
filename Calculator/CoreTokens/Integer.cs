@@ -1,3 +1,5 @@
+using System.Net.Http.Headers;
+
 namespace Calculator;
 
 public struct Integer: IToken
@@ -52,9 +54,7 @@ public struct Integer: IToken
             }
             else if (rhs.Type == TokenType.Real)
             {
-                Real castToReal = new Real(Value);
-
-                return castToReal.ApplyOperation(rhs, op);
+                return CastTo(TokenType.Real).ApplyOperation(rhs, op);
             }
         }
 
@@ -67,6 +67,18 @@ public struct Integer: IToken
 
         if (res < 0) res += b;
         return res;
+    }
+
+    public IToken CastTo(TokenType castTo)
+    {
+        if (castTo == Type) return this;
+
+        if (castTo == TokenType.Real)
+        {
+            return new Real(Value);
+        }
+
+        throw new InvalidCastException("Cannot cast integer to " + castTo);
     }
 
     public string Output() => Value.ToString();

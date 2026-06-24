@@ -67,7 +67,7 @@ public static class Functions
         if (input.Type == TokenType.Real)
         {
             double x = ((Real)input).Value;
-            return new Real(x);
+            return new Real(Math.Sqrt(x));
         }
 
         throw new InvalidOperationException("Cannot take square root of " + input.Type);

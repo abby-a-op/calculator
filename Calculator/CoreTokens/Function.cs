@@ -17,4 +17,11 @@ public struct Function: IToken
     {
         throw new InvalidOperationException($"Operator {op} is invalid on functions");
     }
+
+    public IToken CastTo(TokenType castTo)
+    {
+        if (castTo == Type) return this;
+
+        throw new InvalidCastException("Cannot cast Function to other types");
+    }
 }

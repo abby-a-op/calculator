@@ -16,7 +16,17 @@ public class Interpreter
         "addVec",
         "subVec",
         "scalVec",
-        "dotVec"
+        "dotVec",
+        "Line",
+        "lengthLine",
+        "midpointLine",
+        "gradientLine",
+        "mat",
+        "addMat",
+        "dotMat",
+        "scalMat",
+        "detMat",
+        "invMat"
     };
 
     private InfixEvaluator _Evaluator = new InfixEvaluator();
@@ -258,16 +268,16 @@ public class Interpreter
                 {
                     int a, x, c, m;
 
-                    a = ((Integer)tokens[1]).Value;
-                    x = ((Integer)tokens[2]).Value;
-                    c = ((Integer)tokens[3]).Value;
-                    m = ((Integer)tokens[4]).Value;
+                    a = ((Integer)tokens[1].CastTo(TokenType.Integer)).Value;
+                    x = ((Integer)tokens[2].CastTo(TokenType.Integer)).Value;
+                    c = ((Integer)tokens[3].CastTo(TokenType.Integer)).Value;
+                    m = ((Integer)tokens[4].CastTo(TokenType.Integer)).Value;
 
                     return NumberTheory.NumRand(a, x, c, m);
                 }
                 case "isPrime":
                 {
-                    int a = ((Integer)tokens[1]).Value;
+                    int a = ((Integer)tokens[1].CastTo(TokenType.Integer)).Value;
 
                     return NumberTheory.IsPrime(a).ToString();
                 }
@@ -281,8 +291,8 @@ public class Interpreter
                 {
                     Variable @var = (Variable)tokens[1];
                     
-                    Real x = (Real)tokens[3];
-                    Real y = (Real)tokens[4];
+                    Real x = (Real)tokens[4].CastTo(TokenType.Real);
+                    Real y = (Real)tokens[5].CastTo(TokenType.Real);
                     
                     Vec2 vec = new Vec2(x.Value, y.Value);
                     Variables[@var.Name] = vec;
@@ -312,10 +322,81 @@ public class Interpreter
                 }
                 case "scalVec":
                 {
-                    Real s = (Real)tokens[1];
+                    Real s = (Real)tokens[1].CastTo(TokenType.Real);
                     Vec2 a = (Vec2)tokens[2];
 
                     return a.Scale(s.Value).Output();
+                }
+                case "Line":
+                {
+                    Variable @var = (Variable)tokens[1];
+
+                    Real x1 = (Real)tokens[4].CastTo(TokenType.Real);
+                    Real y1 = (Real)tokens[5].CastTo(TokenType.Real);
+                    Real x2 = (Real)tokens[6].CastTo(TokenType.Real);
+                    Real y2 = (Real)tokens[7].CastTo(TokenType.Real);
+
+                    Variables[@var.Name] = new Line(new Vec2(x1.Value, y1.Value), new Vec2(x2.Value, y2.Value));
+
+                    return Variables[@var.Name].Output();
+                }
+                case "lengthLine":
+                {
+                    return ((Line)tokens[1]).Length().Output();
+                }
+                case "midpointLine":
+                {
+                    return ((Line)tokens[1]).Midpoint().Output();
+                }
+                case "gradientLine":
+                {
+                    return ((Line)tokens[1]).Gradient().Output();   
+                }
+                case "mat":
+                {
+                    Variable @var = (Variable)tokens[1];
+
+                    Real a = (Real)tokens[4].CastTo(TokenType.Real);
+                    Real b = (Real)tokens[5].CastTo(TokenType.Real);
+                    Real c = (Real)tokens[6].CastTo(TokenType.Real);
+                    Real d = (Real)tokens[7].CastTo(TokenType.Real);
+
+                    Variables[@var.Name] = new Matrix(a.Value, b.Value, c.Value, d.Value);
+
+                    return Variables[@var.Name].Output();
+                }
+                case "addMat":
+                {
+                    Matrix a = (Matrix)tokens[1];
+                    Matrix b = (Matrix)tokens[2];
+
+                    return a.Add(b).Output();       
+                }
+                case "dotMat":
+                {
+                    Matrix a = (Matrix)tokens[1];
+                    Matrix b = (Matrix)tokens[2];
+
+                    return a.Dot(b).Output();       
+                }
+                case "scalMat":
+                {
+                    Real s = (Real)tokens[1].CastTo(TokenType.Real);
+                    Matrix a = (Matrix)tokens[2];
+
+                    return a.Scale(s).Output();       
+                }
+                case "detMat":
+                {
+                    Matrix a = (Matrix)tokens[1];
+
+                    return a.Det().Output();
+                }
+                case "invMat":
+                {
+                    Matrix a = (Matrix)tokens[1].CastTo(TokenType.Matrix);
+
+                    return a.Inv().Output();
                 }
                 default:
                 {

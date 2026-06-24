@@ -2,35 +2,35 @@ namespace Calculator;
 
 public struct Matrix: IToken
 {
-    public double X1, Y1, X2, Y2;
+    public double A, B, C, D;
 
     public TokenType Type => TokenType.Matrix;
 
     public Matrix(double x1, double y1, double x2, double y2)
     {
-        X1 = x1;
-        Y1 = y1;
-        X2 = x2;
-        Y2 = y2;
+        A = x1;
+        B = y1;
+        C = x2;
+        D = y2;
     }
 
     public Real Det()
     {
-        return new Real(X1 * Y2 - X2 * Y1);
+        return new Real(A * D - C * B);
     }
 
     public Matrix Scale(Real s)
     {
         double sValue = s.Value;
 
-        return new Matrix(sValue * X1, sValue * Y1, sValue * X2, sValue * Y2);
+        return new Matrix(sValue * A, sValue * B, sValue * C, sValue * D);
     }
 
     public Matrix Add(Matrix b)
     {
         return new Matrix(
-            b.X1 + X1, b.Y1 + Y1,
-            b.X2 + X2, b.Y2 + Y2
+            b.A + A, b.B + B,
+            b.C + C, b.D + D
         );
     }
 
@@ -38,17 +38,17 @@ public struct Matrix: IToken
     {
         double x1, y1, x2, y2;
 
-        x1 = X1*b.X1 + X2*b.Y1;
-        y1 = Y1*b.X1 + Y2*b.Y1;
-        x2 = X1*b.X2 + X2*b.Y2;
-        y2 = Y1*b.X2 + Y2*b.Y2;
+        x1 = A*b.A + C*b.B;
+        y1 = B*b.A + D*b.B;
+        x2 = A*b.C + C*b.D;
+        y2 = B*b.C + D*b.D;
 
         return new Matrix(x1, y1, x2, y2);
     }
 
     public Matrix UnaryMinus()
     {
-        return new Matrix(-X1, -Y1, -X2, -Y2);
+        return new Matrix(-A, -B, -C, -D);
     }
 
     public Matrix Sub(Matrix b)
@@ -56,11 +56,25 @@ public struct Matrix: IToken
         return Add(b.UnaryMinus());
     }
 
+    public Matrix Inv()
+    {
+        Matrix aInv = new Matrix(D, -B, -C, A);
+        Real detReciprocal = (Real)new Real(1.0).ApplyOperation(Det(), OperatorType.Divide).CastTo(TokenType.Real);
+        return aInv.Scale(detReciprocal);
+    }
+
+    public IToken CastTo(TokenType castTo)
+    {
+        if (castTo == Type) return this;
+
+        throw new InvalidCastException("Cannot cast matrix to " + castTo);
+    }
+
     public string Output()
     {
         return $"""
-        {X1}, {X2}
-        {Y1}, {Y2}
+        {A}, {C}
+        {B}, {D}
         """;
     }
 

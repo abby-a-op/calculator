@@ -155,13 +155,13 @@ public class InfixToPostfixParser
             if (isNotOpeningBracket)
             {
                 postfix.Add(poppedOperator);
-
-                if (operatorStack.TryPeek(out IToken? topToken) && topToken.Type == TokenType.Function)
-                {
-                    postfix.Add(operatorStack.Pop());
-                }
             }
         } while (isNotOpeningBracket && operatorStack.Count > 0);
+        
+        if (operatorStack.TryPeek(out IToken? topToken) && topToken.Type == TokenType.Function)
+        {
+            postfix.Add(operatorStack.Pop());
+        }
         return;
     }
 }

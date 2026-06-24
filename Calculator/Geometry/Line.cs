@@ -37,5 +37,12 @@ public struct Line: IToken
         return new Real(deltaX/deltaY);
     }
 
+    public IToken CastTo(TokenType castTo)
+    {
+        if (castTo == Type) return this;
+
+        throw new InvalidCastException("Cannot cast line to " + castTo);
+    }
+
     public string Output() => $"({Point1.X}, {Point1.Y}) - ({Point2.X}, {Point2.Y})";
 }

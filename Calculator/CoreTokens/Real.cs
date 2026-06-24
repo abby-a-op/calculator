@@ -33,10 +33,7 @@ public class Real: IToken
             }
             else if (rhs.Type == TokenType.Integer)
             {
-                int n = ((Integer)rhs).Value;
-
-                Real token = new Real(n);
-                return ApplyOperation(token, op);
+                return ApplyOperation(rhs.CastTo(TokenType.Real), op);
             }
         }
         else
@@ -52,6 +49,17 @@ public class Real: IToken
         }
 
         throw new InvalidOperationException($"Operator {op} is not valid for Real and {rhs.Type}");
+    }
+
+    public IToken CastTo(TokenType castTo)
+    {
+        if (castTo == Type) return this;
+
+        if (castTo == TokenType.Integer)
+        {
+            return new Integer((int)Value);
+        }
+        throw new InvalidCastException("Cannot cast real to " + castTo);
     }
 
     static double Mod(double a, double b)

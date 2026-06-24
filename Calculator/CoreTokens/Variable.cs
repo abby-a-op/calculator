@@ -23,7 +23,14 @@ public struct Variable: IToken
             return rhs;
         }
 
-        throw new InvalidOperationException("Only equals is valid on uninitialised variables");
+        throw new InvalidOperationException($"Variable {Name} is uninitiliased, did you spell it correctly?");
+    }
+
+    public IToken CastTo(TokenType castTo)
+    {
+        if (castTo == Type) return this;
+
+        throw new InvalidCastException("Cannot cast variable to " + castTo);
     }
     
     public string Output() => Name;

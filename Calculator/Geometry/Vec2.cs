@@ -70,5 +70,12 @@ public struct Vec2: IToken
         throw new InvalidOperationException($"Operation {op} is not valid on Vec2");
     }
 
+    public IToken CastTo(TokenType castTo)
+    {
+        if (castTo == Type) return this;
+
+        throw new InvalidCastException("Cannot cast Vec2 to " + castTo);
+    }
+
     public string Output() => $"({X}, {Y})";
 }

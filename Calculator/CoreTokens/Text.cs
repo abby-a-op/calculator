@@ -29,4 +29,11 @@ public struct Text: IToken
 
         throw new InvalidOperationException($"Operation {op} is invalid on text");
     }
+
+    public IToken CastTo(TokenType castTo)
+    {
+        if (castTo == Type) return this;
+
+        throw new InvalidCastException("Cannot cast text to " + castTo);
+    }
 }
