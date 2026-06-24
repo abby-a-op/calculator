@@ -46,7 +46,7 @@ public class InfixToPostfixParser
                 Function functionToken = (Function)token;
 
                 // Since factorials are already a postfix operation, they can be written directly
-                if (functionToken.Value == "!")
+                if (functionToken.Name == "!")
                 {
                     postfix.Add(token);
                     continue;

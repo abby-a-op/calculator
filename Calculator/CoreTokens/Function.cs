@@ -2,16 +2,16 @@ namespace Calculator;
 
 public struct Function: IToken
 {
-    public string Value { get; set; }
+    public string Name { get; set; }
 
     public TokenType Type => TokenType.Function;
 
     public Function(string value)
     {
-        this.Value = value;
+        this.Name = value;
     }
 
-    public string Output() => Value;
+    public string Output() => Name;
 
     public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {

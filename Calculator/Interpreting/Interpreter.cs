@@ -11,7 +11,7 @@ public class Interpreter
         "caesarDe",
         "affineEn",
         "affineDe",
-        "isPrime",
+        "numPrime",
         "vec",
         "addVec",
         "subVec",
@@ -28,6 +28,23 @@ public class Interpreter
         "detMat",
         "invMat"
     };
+
+    private const string HELPTEXT = """
+    ABBYKUS - Abby's Basic But Yuseful KalcUlator Software. Author - Abby Ashton
+
+    Basic usage - Enter any basic mathematical expression to get the result.
+
+    Commands:
+    numRand (int a) (int X) (int c) (int m) - Generates a random number using the linear congruential method
+    numPrime (int a) - Returns true if a number less than or equal to 10000 is prime
+    numCheckDigit (int digits) - Returns a complete barcode number for UPC, EAN-13, or ISBN barcodes
+    
+    caesarEn (text plaintext) - Returns a string encoded with the ROT-3 Caesar cipher
+    caesarDe (text ciphertext) - Decodes a string encoded with the ROT-3 Caesar cipher
+
+    affineEn (int a) (int b) (string plaintext) - Encrypts a string with the affine cipher, using a and b as the keys
+    affineDe (int a) (int b) (string ciphertext) - Decrypts a string with the affine cipher, using a and b as the keys
+    """;
 
     private InfixEvaluator _Evaluator = new InfixEvaluator();
 
@@ -177,7 +194,7 @@ public class Interpreter
                 continue;
             }
             if (tokens[i+1].Type == TokenType.Variable
-                || tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Value != "!"
+                || tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Name != "!"
                 || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket)
             {
                 tokens.Insert(i + 1, new Operator(OperatorType.Multiply));
@@ -250,162 +267,16 @@ public class Interpreter
     {
         IToken[] tokens = Tokenise();
 
-        if (tokens[0].Type == TokenType.Function)
+        if (tokens[0].Type == TokenType.Function && CommandNames.Contains(((Function)tokens[0]).Name))
         {
-            switch (((Function)tokens[0]).Value)
-            {
-                case "caesarEn":
-                {
-                    Text plain = (Text)tokens[1].CastTo(TokenType.Text);
-                    return Encryption.CaesarEn(plain);
-                }
-                case "caesarDe":
-                {
-                    Text cipher = (Text)tokens[1].CastTo(TokenType.Text);
-                    return Encryption.CaesarDe(cipher);
-                }
-                case "numRand":
-                {
-                    int a, x, c, m;
+            Function command = (Function)tokens[0].CastTo(TokenType.Function);
+            IToken[] args = new IToken[tokens.Length - 1];
 
-                    a = ((Integer)tokens[1].CastTo(TokenType.Integer)).Value;
-                    x = ((Integer)tokens[2].CastTo(TokenType.Integer)).Value;
-                    c = ((Integer)tokens[3].CastTo(TokenType.Integer)).Value;
-                    m = ((Integer)tokens[4].CastTo(TokenType.Integer)).Value;
+            Array.Copy(tokens, 1, args, 0, tokens.Length - 1);
 
-                    return NumberTheory.NumRand(a, x, c, m);
-                }
-                case "isPrime":
-                {
-                    int a = ((Integer)tokens[1].CastTo(TokenType.Integer)).Value;
-
-                    return new Text(NumberTheory.IsPrime(a).ToString());
-                }
-                case "numCheckDigit":
-                {
-                    Text digits = (Text)tokens[1].CastTo(TokenType.Text);
-
-                    return NumberTheory.NumCheckDigit(digits);
-                }
-                case "vec":
-                {
-                    Variable @var = (Variable)tokens[1];
-                    
-                    Real x = (Real)tokens[4].CastTo(TokenType.Real);
-                    Real y = (Real)tokens[5].CastTo(TokenType.Real);
-                    
-                    Vec2 vec = new Vec2(x.Value, y.Value);
-                    Variables[@var.Name] = vec;
-                    
-                    return vec;
-                }
-                case "addVec":
-                {
-                    Vec2 a = (Vec2)tokens[1].CastTo(TokenType.Vec2);
-                    Vec2 b = (Vec2)tokens[2].CastTo(TokenType.Vec2);
-
-                    return a.Add(b);
-                }
-                case "subVec":
-                {
-                    Vec2 a = (Vec2)tokens[1].CastTo(TokenType.Vec2);
-                    Vec2 b = (Vec2)tokens[2].CastTo(TokenType.Vec2);
-
-                    return a.Minus(b);
-                }
-                case "dotVec":
-                {
-                    Vec2 a = (Vec2)tokens[1].CastTo(TokenType.Vec2);
-                    Vec2 b = (Vec2)tokens[2].CastTo(TokenType.Vec2);
-
-                    return a.Dot(b);
-                }
-                case "scalVec":
-                {
-                    Real s = (Real)tokens[1].CastTo(TokenType.Real);
-                    Vec2 a = (Vec2)tokens[2].CastTo(TokenType.Vec2);
-
-                    return a.Scale(s.Value);
-                }
-                case "Line":
-                {
-                    Variable @var = (Variable)tokens[1];
-
-                    Real x1 = (Real)tokens[4].CastTo(TokenType.Real);
-                    Real y1 = (Real)tokens[5].CastTo(TokenType.Real);
-                    Real x2 = (Real)tokens[6].CastTo(TokenType.Real);
-                    Real y2 = (Real)tokens[7].CastTo(TokenType.Real);
-
-                    Variables[@var.Name] = new Line(new Vec2(x1.Value, y1.Value), new Vec2(x2.Value, y2.Value));
-
-                    return Variables[@var.Name];
-                }
-                case "lengthLine":
-                {
-                    return ((Line)tokens[1].CastTo(TokenType.Line)).Length();
-                }
-                case "midpointLine":
-                {
-                    return ((Line)tokens[1].CastTo(TokenType.Line)).Midpoint();
-                }
-                case "gradientLine":
-                {
-                    return ((Line)tokens[1].CastTo(TokenType.Line)).Gradient();   
-                }
-                case "mat":
-                {
-                    Variable @var = (Variable)tokens[1];
-
-                    Real a = (Real)tokens[4].CastTo(TokenType.Real);
-                    Real b = (Real)tokens[5].CastTo(TokenType.Real);
-                    Real c = (Real)tokens[6].CastTo(TokenType.Real);
-                    Real d = (Real)tokens[7].CastTo(TokenType.Real);
-
-                    Variables[@var.Name] = new Matrix(a.Value, b.Value, c.Value, d.Value);
-
-                    return Variables[@var.Name];
-                }
-                case "addMat":
-                {
-                    Matrix a = (Matrix)tokens[1].CastTo(TokenType.Matrix);
-                    Matrix b = (Matrix)tokens[2].CastTo(TokenType.Matrix);
-
-                    return a.Add(b);       
-                }
-                case "dotMat":
-                {
-                    Matrix a = (Matrix)tokens[1].CastTo(TokenType.Matrix);
-                    Matrix b = (Matrix)tokens[2].CastTo(TokenType.Matrix);
-
-                    return a.Dot(b);       
-                }
-                case "scalMat":
-                {
-                    Real s = (Real)tokens[1].CastTo(TokenType.Real);
-                    Matrix a = (Matrix)tokens[2].CastTo(TokenType.Matrix);
-
-                    return a.Scale(s);       
-                }
-                case "detMat":
-                {
-                    Matrix a = (Matrix)tokens[1].CastTo(TokenType.Matrix);
-
-                    return a.Det();
-                }
-                case "invMat":
-                {
-                    Matrix a = (Matrix)tokens[1].CastTo(TokenType.Matrix);
-
-                    return a.Inv();
-                }
-                default:
-                {
-                    _Evaluator.Expression = tokens;
-                    return _Evaluator.Evaluate();
-                }
-            }
+            return RunCommand(command, args);
         }
-        
+
         if (tokens[0].Type != TokenType.Text)
         {
             _Evaluator.Expression = tokens;
@@ -414,6 +285,161 @@ public class Interpreter
         else
         {
             return tokens[0];
+        }
+    }
+
+    private IToken RunCommand(Function command, IToken[] args)
+    {
+        switch (command.Name)
+        {
+            case "caesarEn":
+                {
+                    Text plain = (Text)args[0].CastTo(TokenType.Text);
+                    return Encryption.CaesarEn(plain);
+                }
+            case "caesarDe":
+                {
+                    Text cipher = (Text)args[0].CastTo(TokenType.Text);
+                    return Encryption.CaesarDe(cipher);
+                }
+            case "numRand":
+                {
+                    int a, x, c, m;
+
+                    a = ((Integer)args[0].CastTo(TokenType.Integer)).Value;
+                    x = ((Integer)args[1].CastTo(TokenType.Integer)).Value;
+                    c = ((Integer)args[2].CastTo(TokenType.Integer)).Value;
+                    m = ((Integer)args[3].CastTo(TokenType.Integer)).Value;
+
+                    return NumberTheory.NumRand(a, x, c, m);
+                }
+            case "numPrime":
+                {
+                    int a = ((Integer)args[0].CastTo(TokenType.Integer)).Value;
+
+                    return new Text(NumberTheory.IsPrime(a).ToString());
+                }
+            case "numCheckDigit":
+                {
+                    Text digits = (Text)args[0].CastTo(TokenType.Text);
+
+                    return NumberTheory.NumCheckDigit(digits);
+                }
+            case "vec":
+                {
+                    Variable @var = (Variable)args[0];
+
+                    Real x = (Real)args[3].CastTo(TokenType.Real);
+                    Real y = (Real)args[4].CastTo(TokenType.Real);
+
+                    Vec2 vec = new Vec2(x.Value, y.Value);
+                    Variables[@var.Name] = vec;
+
+                    return vec;
+                }
+            case "addVec":
+                {
+                    Vec2 a = (Vec2)args[0].CastTo(TokenType.Vec2);
+                    Vec2 b = (Vec2)args[1].CastTo(TokenType.Vec2);
+
+                    return a.Add(b);
+                }
+            case "subVec":
+                {
+                    Vec2 a = (Vec2)args[0].CastTo(TokenType.Vec2);
+                    Vec2 b = (Vec2)args[1].CastTo(TokenType.Vec2);
+
+                    return a.Minus(b);
+                }
+            case "dotVec":
+                {
+                    Vec2 a = (Vec2)args[0].CastTo(TokenType.Vec2);
+                    Vec2 b = (Vec2)args[1].CastTo(TokenType.Vec2);
+
+                    return a.Dot(b);
+                }
+            case "scalVec":
+                {
+                    Real s = (Real)args[0].CastTo(TokenType.Real);
+                    Vec2 a = (Vec2)args[1].CastTo(TokenType.Vec2);
+
+                    return a.Scale(s.Value);
+                }
+            case "Line":
+                {
+                    Variable @var = (Variable)args[0];
+
+                    Real x1 = (Real)args[3].CastTo(TokenType.Real);
+                    Real y1 = (Real)args[4].CastTo(TokenType.Real);
+                    Real x2 = (Real)args[5].CastTo(TokenType.Real);
+                    Real y2 = (Real)args[6].CastTo(TokenType.Real);
+
+                    Variables[@var.Name] = new Line(new Vec2(x1.Value, y1.Value), new Vec2(x2.Value, y2.Value));
+
+                    return Variables[@var.Name];
+                }
+            case "lengthLine":
+                {
+                    return ((Line)args[0].CastTo(TokenType.Line)).Length();
+                }
+            case "midpointLine":
+                {
+                    return ((Line)args[0].CastTo(TokenType.Line)).Midpoint();
+                }
+            case "gradientLine":
+                {
+                    return ((Line)args[0].CastTo(TokenType.Line)).Gradient();
+                }
+            case "mat":
+                {
+                    Variable @var = (Variable)args[0];
+
+                    Real a = (Real)args[3].CastTo(TokenType.Real);
+                    Real b = (Real)args[4].CastTo(TokenType.Real);
+                    Real c = (Real)args[5].CastTo(TokenType.Real);
+                    Real d = (Real)args[6].CastTo(TokenType.Real);
+
+                    Variables[@var.Name] = new Matrix(a.Value, b.Value, c.Value, d.Value);
+
+                    return Variables[@var.Name];
+                }
+            case "addMat":
+                {
+                    Matrix a = (Matrix)args[0].CastTo(TokenType.Matrix);
+                    Matrix b = (Matrix)args[1].CastTo(TokenType.Matrix);
+
+                    return a.Add(b);
+                }
+            case "dotMat":
+                {
+                    Matrix a = (Matrix)args[0].CastTo(TokenType.Matrix);
+                    Matrix b = (Matrix)args[1].CastTo(TokenType.Matrix);
+
+                    return a.Dot(b);
+                }
+            case "scalMat":
+                {
+                    Real s = (Real)args[0].CastTo(TokenType.Real);
+                    Matrix a = (Matrix)args[1].CastTo(TokenType.Matrix);
+
+                    return a.Scale(s);
+                }
+            case "detMat":
+                {
+                    Matrix a = (Matrix)args[0].CastTo(TokenType.Matrix);
+
+                    return a.Det();
+                }
+            case "invMat":
+                {
+                    Matrix a = (Matrix)args[0].CastTo(TokenType.Matrix);
+
+                    return a.Inv();
+                }
+            default:
+                {
+                    throw new NotImplementedException($"Command {command.Name} is not implemented");
+                }
         }
     }
 }

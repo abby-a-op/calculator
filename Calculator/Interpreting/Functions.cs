@@ -4,7 +4,7 @@ public static class Functions
 {
     public static IToken EvaluateFunction(Function func, IToken x)
     {
-        return func.Value switch
+        return func.Name switch
         {
             "sqrt" => Sqrt(x),
             "!" => Factorial(x),
