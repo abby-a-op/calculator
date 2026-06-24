@@ -27,24 +27,22 @@ public class PostfixParser
             }
             
             while (
-                OperatorStack.TryPeek(out IToken? top)
+                OperatorStack.Count > 0
                 && NumberStack.Count > 0
-                && (top.Type == TokenType.Function || top.Type == TokenType.Operator)
                 )
             {
-                IToken popped = OperatorStack.Pop();
+                IToken top = OperatorStack.Pop();
 
-                if (popped.Type == TokenType.Function)
+                if (top.Type == TokenType.Function)
                 {
                     IToken n = NumberStack.Pop();
-
-                    IToken result = Functions.EvaluateFunction((Function)popped, n);
+                    IToken result = Functions.EvaluateFunction((Function)top, n);
 
                     NumberStack.Push(result);
                 }
-                else if (popped.Type == TokenType.Operator)
+                else if (top.Type == TokenType.Operator)
                 {
-                    OperatorType op = ((Operator)popped).Value;
+                    OperatorType op = ((Operator)top).Value;
 
                     if (op == OperatorType.UnaryPlus || op == OperatorType.UnaryMinus)
                     {
@@ -61,9 +59,19 @@ public class PostfixParser
                         IToken result = lhs.ApplyOperation(rhs, op);
                         NumberStack.Push(result);
                     }
+                    else
+                    {
+                        throw new FormatException("Not a valid mathematical expression");
+                    }
                 }
             }
         }
+
+        if (NumberStack.Count != 1 || OperatorStack.Count != 0)
+        {
+            throw new FormatException("Not a valid mathematical expression");
+        }
+
         return NumberStack.Pop();
     }
 }
