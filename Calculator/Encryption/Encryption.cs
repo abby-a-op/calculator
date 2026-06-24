@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Calculator;
 
 public static class Encryption
@@ -12,9 +14,9 @@ public static class Encryption
         { 5, 21 },
         { 7, 15 },
         { 9, 3 },
-        { 11, 9 },
+        { 11, 19 },
         { 15, 7 },
-        { 17, 19 },
+        { 17, 23 },
         { 19, 11 },
         { 21, 5 },
         { 23, 17 },
@@ -139,12 +141,14 @@ public static class Encryption
         return new Text(cipherText);
     }
 
-    public static string AffineEn(int a, int b, string plaintext)
+    public static Text AffineEn(int a, int b, Text plaintextToken)
     {
         if (!InvMod.ContainsKey(a))
         {
-            return "Invalid value of a";
+            throw new ArgumentException($"{a} has no inverse mod 26");
         }
+
+        string plaintext = plaintextToken.Value;
 
         string cipherText = "";
 
@@ -153,23 +157,26 @@ public static class Encryption
             int n = GetLetterNumber(p, out bool isUpper);
 
             int cipherIndex = a * n + b;
+            cipherIndex %= 26;
+
+            if (cipherIndex < 0) cipherIndex += 26;
             
             char c = GetLetterFromNumber(cipherIndex, isUpper);
-            c = ModChar(c, 26, isUpper);
 
             cipherText += c;
         }
 
-        return cipherText;
+        return new Text(cipherText);
     }
 
-    public static string AffineDe(int a, int b, string ciphertext)
+    public static Text AffineDe(int a, int b, Text ciphertextToken)
     {
         if (!InvMod.ContainsKey(a))
         {
-            return "Invalid value of a";
+            throw new ArgumentException(a + " has no inverse mod 26");
         }
 
+        string ciphertext = ciphertextToken.Value;
         string plaintext = "";
 
         foreach (char c in ciphertext)
@@ -177,6 +184,9 @@ public static class Encryption
             int n = GetLetterNumber(c, out bool isUpper);
             
             int plainIndex = InvMod[a] * (n-b);
+            plainIndex %= 26;
+
+            if (plainIndex < 0) plainIndex += 26;
 
             char p = GetLetterFromNumber(plainIndex, isUpper);
             p = ModChar(p, 26, isUpper);
@@ -184,6 +194,33 @@ public static class Encryption
             plaintext += p;
         }
 
-        return plaintext;
+        return new Text(plaintext);
+    }
+
+    public static Text BruteAffine(Text ciphertextToken)
+    {
+        DateTime initial = DateTime.Now;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        foreach (var kvp in InvMod)
+        {
+            int a = kvp.Key;
+            for (int b=0; b<26; b++)
+            {
+                stringBuilder.Append('"');
+                stringBuilder.Append(AffineDe(a, b, ciphertextToken).Value);
+                stringBuilder.Append("\" a=");
+                stringBuilder.Append(a);
+                stringBuilder.Append(", b=");
+                stringBuilder.Append(b);
+                stringBuilder.Append('\n');
+            }
+        }
+        DateTime final = DateTime.Now;
+        TimeSpan timespanTaken = (final - initial).Duration();
+
+        stringBuilder.Append($"\nCompleted in {timespanTaken.TotalMilliseconds} milliseconds");
+
+        return new Text(stringBuilder.ToString());
     }
 }

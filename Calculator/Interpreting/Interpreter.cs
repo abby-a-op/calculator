@@ -9,6 +9,7 @@ public class Interpreter
         "numRand",
         "caesarEn",
         "caesarDe",
+        "bruteAffine",
         "affineEn",
         "affineDe",
         "numPrime",
@@ -26,7 +27,9 @@ public class Interpreter
         "dotMat",
         "scalMat",
         "detMat",
-        "invMat"
+        "invMat",
+        "help",
+        "?"
     };
 
     private const string HELPTEXT = """
@@ -292,6 +295,11 @@ public class Interpreter
     {
         switch (command.Name)
         {
+            case "?":
+            case "help":
+                {
+                    return new Text(HELPTEXT);
+                }
             case "caesarEn":
                 {
                     Text plain = (Text)args[0].CastTo(TokenType.Text);
@@ -301,6 +309,34 @@ public class Interpreter
                 {
                     Text cipher = (Text)args[0].CastTo(TokenType.Text);
                     return Encryption.CaesarDe(cipher);
+                }
+            case "affineEn":
+                {
+                    int a, b;
+
+                    a = ((Integer)args[0].CastTo(TokenType.Integer)).Value;
+                    b = ((Integer)args[1].CastTo(TokenType.Integer)).Value;
+
+                    Text plain = (Text)args[3].CastTo(TokenType.Text);
+
+                    return Encryption.AffineEn(a, b, plain);
+                }
+            case "affineDe":
+                {
+                    int a, b;
+
+                    a = ((Integer)args[0].CastTo(TokenType.Integer)).Value;
+                    b = ((Integer)args[1].CastTo(TokenType.Integer)).Value;
+
+                    Text plain = (Text)args[3].CastTo(TokenType.Text);
+
+                    return Encryption.AffineDe(a, b, plain);
+                }
+            case "bruteAffine":
+                {
+                    Text cipher = (Text)args[0].CastTo(TokenType.Text);
+
+                    return Encryption.BruteAffine(cipher);
                 }
             case "numRand":
                 {
