@@ -73,6 +73,7 @@ public struct Vec2: IToken
     public IToken CastTo(TokenType castTo)
     {
         if (castTo == Type) return this;
+        if (castTo == TokenType.Text) return new Text(Output());
 
         throw new InvalidCastException("Cannot cast Vec2 to " + castTo);
     }

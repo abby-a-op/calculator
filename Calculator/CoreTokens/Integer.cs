@@ -71,14 +71,13 @@ public struct Integer: IToken
 
     public IToken CastTo(TokenType castTo)
     {
-        if (castTo == Type) return this;
-
-        if (castTo == TokenType.Real)
+        return castTo switch
         {
-            return new Real(Value);
-        }
-
-        throw new InvalidCastException("Cannot cast integer to " + castTo);
+            TokenType.Integer => this,
+            TokenType.Real => new Real(Value),
+            TokenType.Text => new Text(Output()),
+            _ => throw new InvalidCastException("Cannot cast integer to " + castTo)
+        };
     }
 
     public string Output() => Value.ToString();

@@ -4,13 +4,13 @@ namespace Calculator;
 
 public static class NumberTheory
 {
-    public static string NumRand(int a, int x, int c, int m)
+    public static Text NumRand(int a, int x, int c, int m)
     {
         int next = (a * x + c) % m;
 
         if (next < 0) next += m;
 
-        return $"{next} = ({a}*{x} + {c}) mod {m}";
+        return new Text($"{next} = ({a}*{x} + {c}) mod {m}");
     }
 
     public static bool IsPrime(int n)
@@ -33,8 +33,9 @@ public static class NumberTheory
         return true;
     }
 
-    public static string NumCheckDigit(string digits)
+    public static Text NumCheckDigit(Text digitsToken)
     {
+        string digits = digitsToken.Value;
         int result = -1;
         // UPC
         if (digits.Length == 11)
@@ -84,6 +85,6 @@ public static class NumberTheory
             if (result < 0) result += 10;
         }
 
-        return digits + result.ToString();
+        return new Text(digits + result.ToString());
     }
 }

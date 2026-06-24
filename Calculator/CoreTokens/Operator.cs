@@ -18,9 +18,12 @@ public struct Operator: IToken
 
     public IToken CastTo(TokenType castTo)
     {
-        if (castTo == Type) return this;
-
-        throw new InvalidCastException("Cannot cast operator to other type");
+        return castTo switch
+        {
+            TokenType.Operator => this,
+            TokenType.Text => new Text(Output()),
+            _ => throw new InvalidCastException("Cannot cast operator to other type")
+        };
     }
 
     public string Output() => ((char)Value).ToString();

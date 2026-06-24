@@ -66,6 +66,7 @@ public struct Matrix: IToken
     public IToken CastTo(TokenType castTo)
     {
         if (castTo == Type) return this;
+        if (castTo == TokenType.Text) return new Text(Output());
 
         throw new InvalidCastException("Cannot cast matrix to " + castTo);
     }

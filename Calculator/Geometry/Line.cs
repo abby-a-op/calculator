@@ -41,6 +41,8 @@ public struct Line: IToken
     {
         if (castTo == Type) return this;
 
+        if (castTo == TokenType.Text) return new Text(Output());
+
         throw new InvalidCastException("Cannot cast line to " + castTo);
     }
 

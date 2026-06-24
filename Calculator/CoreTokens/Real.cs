@@ -53,13 +53,13 @@ public class Real: IToken
 
     public IToken CastTo(TokenType castTo)
     {
-        if (castTo == Type) return this;
-
-        if (castTo == TokenType.Integer)
+        return castTo switch
         {
-            return new Integer((int)Value);
-        }
-        throw new InvalidCastException("Cannot cast real to " + castTo);
+            TokenType.Real => this,
+            TokenType.Integer => new Integer((int)Value),
+            TokenType.Text => new Text(Output()),
+            _ => throw new InvalidCastException("Cannot cast real to " + castTo)
+        };
     }
 
     static double Mod(double a, double b)

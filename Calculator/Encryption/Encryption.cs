@@ -71,9 +71,10 @@ public static class Encryption
         return c;
     }
 
-    public static string CaesarDe(string cipherText)
+    public static Text CaesarDe(Text input)
     {
         string plaintext = "";
+        string cipherText = input.Value;
 
         foreach (char c in cipherText)
         {
@@ -98,12 +99,13 @@ public static class Encryption
             plaintext += p;
         }
 
-        return plaintext;
+        return new Text(plaintext);
     }
     
-    public static string CaesarEn(string plaintext)
+    public static Text CaesarEn(Text input)
     {
         string cipherText = "";
+        string plaintext = input.Value;
 
         foreach (char p in plaintext)
         {
@@ -134,7 +136,7 @@ public static class Encryption
             cipherText += c;
         }
 
-        return cipherText;
+        return new Text(cipherText);
     }
 
     public static string AffineEn(int a, int b, string plaintext)

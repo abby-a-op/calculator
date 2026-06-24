@@ -246,7 +246,7 @@ public class Interpreter
         return currentTokenData;
     }
 
-    public string Run()
+    public IToken Run()
     {
         IToken[] tokens = Tokenise();
 
@@ -256,13 +256,13 @@ public class Interpreter
             {
                 case "caesarEn":
                 {
-                    string plaintext = ((Text)tokens[1]).Value;
-                    return Encryption.CaesarEn(plaintext);
+                    Text plain = (Text)tokens[1].CastTo(TokenType.Text);
+                    return Encryption.CaesarEn(plain);
                 }
                 case "caesarDe":
                 {
-                    string plaintext = ((Text)tokens[1]).Value;
-                    return Encryption.CaesarDe(plaintext);
+                    Text cipher = (Text)tokens[1].CastTo(TokenType.Text);
+                    return Encryption.CaesarDe(cipher);
                 }
                 case "numRand":
                 {
@@ -279,11 +279,11 @@ public class Interpreter
                 {
                     int a = ((Integer)tokens[1].CastTo(TokenType.Integer)).Value;
 
-                    return NumberTheory.IsPrime(a).ToString();
+                    return new Text(NumberTheory.IsPrime(a).ToString());
                 }
                 case "numCheckDigit":
                 {
-                    string digits = ((Integer)tokens[1]).Output();
+                    Text digits = (Text)tokens[1].CastTo(TokenType.Text);
 
                     return NumberTheory.NumCheckDigit(digits);
                 }
@@ -297,35 +297,35 @@ public class Interpreter
                     Vec2 vec = new Vec2(x.Value, y.Value);
                     Variables[@var.Name] = vec;
                     
-                    return vec.Output();
+                    return vec;
                 }
                 case "addVec":
                 {
-                    Vec2 a = (Vec2)tokens[1];
-                    Vec2 b = (Vec2)tokens[2];
+                    Vec2 a = (Vec2)tokens[1].CastTo(TokenType.Vec2);
+                    Vec2 b = (Vec2)tokens[2].CastTo(TokenType.Vec2);
 
-                    return a.Add(b).Output();
+                    return a.Add(b);
                 }
                 case "subVec":
                 {
-                    Vec2 a = (Vec2)tokens[1];
-                    Vec2 b = (Vec2)tokens[2];
+                    Vec2 a = (Vec2)tokens[1].CastTo(TokenType.Vec2);
+                    Vec2 b = (Vec2)tokens[2].CastTo(TokenType.Vec2);
 
-                    return a.Minus(b).Output();
+                    return a.Minus(b);
                 }
                 case "dotVec":
                 {
-                    Vec2 a = (Vec2)tokens[1];
-                    Vec2 b = (Vec2)tokens[2];
+                    Vec2 a = (Vec2)tokens[1].CastTo(TokenType.Vec2);
+                    Vec2 b = (Vec2)tokens[2].CastTo(TokenType.Vec2);
 
-                    return a.Dot(b).Output();
+                    return a.Dot(b);
                 }
                 case "scalVec":
                 {
                     Real s = (Real)tokens[1].CastTo(TokenType.Real);
-                    Vec2 a = (Vec2)tokens[2];
+                    Vec2 a = (Vec2)tokens[2].CastTo(TokenType.Vec2);
 
-                    return a.Scale(s.Value).Output();
+                    return a.Scale(s.Value);
                 }
                 case "Line":
                 {
@@ -338,19 +338,19 @@ public class Interpreter
 
                     Variables[@var.Name] = new Line(new Vec2(x1.Value, y1.Value), new Vec2(x2.Value, y2.Value));
 
-                    return Variables[@var.Name].Output();
+                    return Variables[@var.Name];
                 }
                 case "lengthLine":
                 {
-                    return ((Line)tokens[1]).Length().Output();
+                    return ((Line)tokens[1].CastTo(TokenType.Line)).Length();
                 }
                 case "midpointLine":
                 {
-                    return ((Line)tokens[1]).Midpoint().Output();
+                    return ((Line)tokens[1].CastTo(TokenType.Line)).Midpoint();
                 }
                 case "gradientLine":
                 {
-                    return ((Line)tokens[1]).Gradient().Output();   
+                    return ((Line)tokens[1].CastTo(TokenType.Line)).Gradient();   
                 }
                 case "mat":
                 {
@@ -363,70 +363,57 @@ public class Interpreter
 
                     Variables[@var.Name] = new Matrix(a.Value, b.Value, c.Value, d.Value);
 
-                    return Variables[@var.Name].Output();
+                    return Variables[@var.Name];
                 }
                 case "addMat":
                 {
-                    Matrix a = (Matrix)tokens[1];
-                    Matrix b = (Matrix)tokens[2];
+                    Matrix a = (Matrix)tokens[1].CastTo(TokenType.Matrix);
+                    Matrix b = (Matrix)tokens[2].CastTo(TokenType.Matrix);
 
-                    return a.Add(b).Output();       
+                    return a.Add(b);       
                 }
                 case "dotMat":
                 {
-                    Matrix a = (Matrix)tokens[1];
-                    Matrix b = (Matrix)tokens[2];
+                    Matrix a = (Matrix)tokens[1].CastTo(TokenType.Matrix);
+                    Matrix b = (Matrix)tokens[2].CastTo(TokenType.Matrix);
 
-                    return a.Dot(b).Output();       
+                    return a.Dot(b);       
                 }
                 case "scalMat":
                 {
                     Real s = (Real)tokens[1].CastTo(TokenType.Real);
-                    Matrix a = (Matrix)tokens[2];
+                    Matrix a = (Matrix)tokens[2].CastTo(TokenType.Matrix);
 
-                    return a.Scale(s).Output();       
+                    return a.Scale(s);       
                 }
                 case "detMat":
                 {
-                    Matrix a = (Matrix)tokens[1];
+                    Matrix a = (Matrix)tokens[1].CastTo(TokenType.Matrix);
 
-                    return a.Det().Output();
+                    return a.Det();
                 }
                 case "invMat":
                 {
                     Matrix a = (Matrix)tokens[1].CastTo(TokenType.Matrix);
 
-                    return a.Inv().Output();
+                    return a.Inv();
                 }
                 default:
                 {
                     _Evaluator.Expression = tokens;
-                    return _Evaluator.Evaluate().Output();
+                    return _Evaluator.Evaluate();
                 }
             }
         }
         
-        // if (tokens[0].Type == TokenType.Variable && tokens[1].Type == TokenType.Operator && ((Operator)tokens[1]).Value == OperatorType.Equals)
-        // {
-        //     Variable variable = (Variable)tokens[0];
-            
-        //     IToken[] expressionForVariable = new IToken[tokens.Length - 2];
-        //     Array.Copy(tokens, 2, expressionForVariable, 0, expressionForVariable.Length);
-        //     _Evaluator.Expression = tokens;
-            
-        //     Variables[variable.Name] = _Evaluator.Evaluate();
-            
-        //     return Variables[variable.Name].Output();
-        // }
-        
         if (tokens[0].Type != TokenType.Text)
         {
             _Evaluator.Expression = tokens;
-            return _Evaluator.Evaluate().Output();
+            return _Evaluator.Evaluate();
         }
         else
         {
-            return "";
+            return tokens[0];
         }
     }
 }
