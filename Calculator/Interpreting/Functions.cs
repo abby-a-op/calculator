@@ -26,6 +26,12 @@ public static class Functions
 
             Integer output = new Integer();
             output.Value = Factorial(n);
+
+            if (output.Value == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(@input), "Result exceeded 32 bit integer limit");
+            }
+
             return output;
         }
 
