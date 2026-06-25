@@ -11,7 +11,7 @@ public class Program
 
         while (continuing)
         {
-            string input = Console.ReadLine();
+            string? input = Console.ReadLine();
 
             if (input != null)
             {
