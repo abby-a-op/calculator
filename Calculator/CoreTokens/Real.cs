@@ -1,5 +1,7 @@
 namespace Calculator;
 
+// Struct for real numbers (i.e floats)
+// Used for parity with bc
 public class Real: IToken
 {
     public double Value { get; set; }

@@ -1,10 +1,27 @@
 namespace Calculator;
 
+// Token for operator
 public struct Operator: IToken
 {
     public TokenType Type => TokenType.Operator;
 
     public OperatorType Value { get; set; }
+
+    public Operator(char symbol)
+    {
+        Value = symbol switch
+        {
+            '+' => OperatorType.Plus,
+            '-' => OperatorType.Minus,
+            '*' => OperatorType.Multiply,
+            '/' => OperatorType.Divide,
+            '%' => OperatorType.Modulo,
+            '^' => OperatorType.Exponentiate,
+            '(' => OperatorType.OpeningBracket,
+            ')' => OperatorType.ClosingBracket,
+            _ => throw new ArgumentException($"{symbol} is not a valid operator")
+        };
+    }
 
     public Operator(OperatorType value)
     {
@@ -26,21 +43,22 @@ public struct Operator: IToken
         };
     }
 
-    public string Output() => ((char)Value).ToString();
+    public string Output() => Value.ToString();
 }
 
+// An enum for checking the type of operator, useful as some operators share symbols (unary and binary minus, for example)
 public enum OperatorType
 {
-    Plus = '+',
-    Minus = '-',
-    Multiply = '*',
-    Divide = '/',
-    Exponentiate = '^',
-    Modulo = '%',
-    OpeningBracket = '(',
-    ClosingBracket = ')',
-    Equals = '=',
-    UnaryPlus = '$',
-    UnaryMinus = '@',
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
+    Exponentiate,
+    Modulo,
+    OpeningBracket,
+    ClosingBracket,
+    Equals,
+    UnaryPlus,
+    UnaryMinus,
 
 }

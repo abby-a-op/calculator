@@ -1,5 +1,6 @@
 namespace Calculator;
 
+// Struct for function token, used to allow functions to be in an expression
 public struct Function: IToken
 {
     public string Name { get; set; }

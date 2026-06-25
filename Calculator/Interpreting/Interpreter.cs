@@ -95,7 +95,7 @@ public class Interpreter
         {
             TokenType.Integer => new Integer(int.Parse(tokenText)),
             TokenType.Text => new Text(tokenText),
-            TokenType.Operator => new Operator((OperatorType)tokenText[0]),
+            TokenType.Operator => new Operator(tokenText[0]),
             TokenType.Function => new Function(tokenText),
             TokenType.Real => new Real(double.Parse(tokenText)),
             TokenType.Variable => new Variable(tokenText, Variables),
@@ -280,6 +280,12 @@ public class Interpreter
         for (int i = 0; i < tokens.Count; i++)
         {
             if (tokens[i].Type != TokenType.Variable)
+            {
+                continue;
+            }
+
+            // Do not substitute if you are reassigning the variable
+            if (tokens[i+1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.Equals)
             {
                 continue;
             }

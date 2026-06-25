@@ -1,7 +1,6 @@
-using System.Net.Http.Headers;
-
 namespace Calculator;
 
+// Struct for integer token, seperated from inbuilt integer type to allow other types to be used
 public struct Integer: IToken
 {
     public int Value { get; set; }
