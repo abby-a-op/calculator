@@ -20,31 +20,17 @@ public static class Functions
 
     public static IToken Factorial(IToken input)
     {
-        if (input.Type == TokenType.Integer)
+        int n = ((Integer)input.CastTo(TokenType.Integer)).Value;
+
+        Integer output = new Integer();
+        output.Value = Factorial(n);
+
+        if (output.Value == 0)
         {
-            int n = ((Integer)input).Value;
-
-            Integer output = new Integer();
-            output.Value = Factorial(n);
-
-            if (output.Value == 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(@input), "Result exceeded 32 bit integer limit");
-            }
-
-            return output;
+            throw new ArgumentOutOfRangeException(nameof(@input), "Result exceeded 32 bit integer limit");
         }
 
-        else if (input.Type == TokenType.Real)
-        {
-            double x = ((Real)input).Value;
-
-            Integer output = new Integer();
-            output.Value = Factorial((int)x);
-            return output;
-        }
-
-        throw new InvalidOperationException("Cannot take factorial of " + input.Type);
+        return output;
     }
 
     static int Factorial(int n)
@@ -64,18 +50,7 @@ public static class Functions
 
     public static IToken Sqrt(IToken input)
     {
-        if (input.Type == TokenType.Integer)
-        {
-            int n = ((Integer)input).Value;
-            return new Integer((int)Math.Sqrt(n));
-        }
-        
-        if (input.Type == TokenType.Real)
-        {
-            double x = ((Real)input).Value;
-            return new Real(Math.Sqrt(x));
-        }
-
-        throw new InvalidOperationException("Cannot take square root of " + input.Type);
+        double x = ((Real)input.CastTo(TokenType.Real)).Value;
+        return new Real(Math.Sqrt(x));
     }
 }
