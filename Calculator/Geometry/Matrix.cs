@@ -6,12 +6,12 @@ public struct Matrix: IToken
 
     public TokenType Type => TokenType.Matrix;
 
-    public Matrix(double x1, double y1, double x2, double y2)
+    public Matrix(double a, double b, double c, double d)
     {
-        A = x1;
-        B = y1;
-        C = x2;
-        D = y2;
+        A = a;
+        B = b;
+        C = c;
+        D = d;
     }
 
     public Real Det()
@@ -26,24 +26,24 @@ public struct Matrix: IToken
         return new Matrix(sValue * A, sValue * B, sValue * C, sValue * D);
     }
 
-    public Matrix Add(Matrix b)
+    public Matrix Add(Matrix rhs)
     {
         return new Matrix(
-            b.A + A, b.B + B,
-            b.C + C, b.D + D
+            rhs.A + A, rhs.B + B,
+            rhs.C + C, rhs.D + D
         );
     }
 
-    public Matrix Dot(Matrix b)
+    public Matrix Dot(Matrix rhs)
     {
-        double x1, y1, x2, y2;
+        double a, b, c, d;
 
-        x1 = A*b.A + C*b.B;
-        y1 = B*b.A + D*b.B;
-        x2 = A*b.C + C*b.D;
-        y2 = B*b.C + D*b.D;
+        a = A*rhs.A + C*rhs.B;
+        b = B*rhs.A + D*rhs.B;
+        c = A*rhs.C + C*rhs.D;
+        d = B*rhs.C + D*rhs.D;
 
-        return new Matrix(x1, y1, x2, y2);
+        return new Matrix(a, b, c, d);
     }
 
     public Matrix UnaryMinus()
@@ -79,6 +79,7 @@ public struct Matrix: IToken
         """;
     }
 
+    // Allows arithmetic operations to be performed on matrices
     public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
         if (rhs == null)

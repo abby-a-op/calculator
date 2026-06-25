@@ -1,15 +1,13 @@
-﻿using System.Reflection;
-using System.Runtime.ConstrainedExecution;
-using System.Security.Cryptography;
+﻿namespace Calculator;
 
-namespace Calculator;
-
+// Class for evaluating the result of a postfix expression
 public class PostfixParser
 {
-    private const string OPERATORS = "+-*/^";
-
     public IToken[] Expression = new IToken[] { };
 
+    // This method evaluates the result of a postfix expression
+    // Postfix notation was used because it provides a relatively simple way to compute the result of an equation without
+    // explicitly needing to account for the order of operations. As such, the calculator would be guaranteed to be accurate 
     public IToken Evaluate()
     {
         Stack<IToken> NumberStack = new Stack<IToken>();

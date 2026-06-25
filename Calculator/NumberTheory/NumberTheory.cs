@@ -1,16 +1,29 @@
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Calculator;
 
+// Class for the number theory commands
 public static class NumberTheory
 {
     public static Text NumRand(int a, int x, int c, int m)
     {
-        int next = (a * x + c) % m;
+        StringBuilder stringBuilder = new StringBuilder();
+        int i = 0;
 
-        if (next < 0) next += m;
+        int seed = x;
+        do
+        {
+            int newSeed = (a * seed + c) % m;
+            if (newSeed < 0) newSeed += m;
+        
+            stringBuilder.AppendLine($"{newSeed} = ({a}*{seed} + {c}) mod {m}");
 
-        return new Text($"{next} = ({a}*{x} + {c}) mod {m}");
+            seed = newSeed;
+        } while (seed != x && i < m);
+        stringBuilder.Remove(stringBuilder.Length - 1, 1);
+
+        return new Text(stringBuilder.ToString());
     }
 
     public static bool IsPrime(int n)

@@ -1,5 +1,6 @@
 namespace Calculator;
 
+// Class allowing manipulation of lines
 public struct Line: IToken
 {
     public Vec2 Point1, Point2;

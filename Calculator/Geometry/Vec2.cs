@@ -1,5 +1,7 @@
 namespace Calculator;
 
+// Struct representing 2D vectors
+// Used to allow manipulation of vectors
 public struct Vec2: IToken
 {
     public double X, Y;
@@ -42,6 +44,7 @@ public struct Vec2: IToken
         return (Real)Functions.Sqrt(new Real(X*X + Y*Y));
     }
 
+    // Allows operations on vectors to be done in the equation mode
     public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
         if (rhs == null)

@@ -2,6 +2,7 @@ using System.Text;
 
 namespace Calculator;
 
+// Contains code for the encryption section of the assignment
 public static class Encryption
 {
     const string LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
@@ -57,6 +58,7 @@ public static class Encryption
         }
     }
 
+    // Performs ROT-3 Caesar cipher decoding
     public static Text CaesarDe(Text input)
     {
         string plaintext = "";
@@ -85,7 +87,8 @@ public static class Encryption
 
         return new Text(plaintext);
     }
-    
+
+    // Performs ROT-3 Caesar cipher encoding
     public static Text CaesarEn(Text input)
     {
         string cipherText = "";
@@ -114,6 +117,7 @@ public static class Encryption
         return new Text(cipherText);
     }
 
+    // Encodes a string using the affine cipher
     public static Text AffineEn(int a, int b, Text plaintextToken)
     {
         if (!InvMod.ContainsKey(a))
@@ -149,6 +153,7 @@ public static class Encryption
         return new Text(cipherText);
     }
 
+    // Decodes a string using the affine cipher
     public static Text AffineDe(int a, int b, Text ciphertextToken)
     {
         if (!InvMod.ContainsKey(a))
@@ -184,6 +189,7 @@ public static class Encryption
         return new Text(plaintext);
     }
 
+    // Brute forces the decryption of an affine cipher by checking every possible key pair
     public static Text BruteAffine(Text ciphertextToken)
     {
         DateTime initial = DateTime.Now;
@@ -194,6 +200,7 @@ public static class Encryption
             int a = kvp.Key;
             for (int b=0; b<26; b++)
             {
+                // Writes the output to a log
                 stringBuilder.Append('"');
                 stringBuilder.Append(AffineDe(a, b, ciphertextToken).Value);
                 stringBuilder.Append("\" a=");

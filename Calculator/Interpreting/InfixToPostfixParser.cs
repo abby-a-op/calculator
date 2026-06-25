@@ -24,6 +24,7 @@ public class InfixToPostfixParser
     public IToken[] Expression = new IToken[] { };
 
     // Implementation of Shunting Yard Algorithm (Reference: https://mathcenter.oxford.emory.edu/site/cs171/shuntingYardAlgorithm)
+    // The SYA is the canonical method for converting infix to postfix, and was used due to it coming up often in my research
     public IToken[] Parse()
     {
         Stack<IToken> operatorStack = new Stack<IToken>();
@@ -124,6 +125,8 @@ public class InfixToPostfixParser
         return postfix.ToArray();
     }
 
+    // Used to parse operators of lower precedence to the current one
+    // Split off from main parse method as code was becoming unweildy
     private static void ParseLowerPrecedence(Stack<IToken> operatorStack, List<IToken> postfix, Operator token, int currentPrecedence, int topPrecedence)
     {
         while (
@@ -143,6 +146,8 @@ public class InfixToPostfixParser
         operatorStack.Push(token);
     }
 
+    // Called when the current operator is a closing bracket
+    // Split off from main parse method as code was becoming unweildy
     private static void ParseClosingBracket(Stack<IToken> operatorStack, List<IToken> postfix)
     {
         IToken poppedOperator;

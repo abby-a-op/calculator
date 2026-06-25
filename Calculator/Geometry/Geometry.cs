@@ -1,5 +1,7 @@
 ﻿namespace Calculator
 {
+    // Class for the generic commands in the geometry section
+    // Cordoned off from rest of code for readability
     public static class Geometry
     {
         public static Real DegToRad(Real degrees)

@@ -1,5 +1,7 @@
 namespace Calculator;
 
+// Main class for the backend of the calculator
+// Used for tokenising expressions and running commands
 public class Interpreter
 {
     public string Command = "";
@@ -86,6 +88,7 @@ public class Interpreter
 
     public Dictionary<string, IToken> Variables = new Dictionary<string, IToken>();
 
+    // Method for converting the text for a token into an object for performing operations on
     private IToken ParseTokenText(string tokenText, TokenType tokenType)
     {
         return tokenType switch
@@ -155,8 +158,8 @@ public class Interpreter
             {
                 if (currentTokenType == TokenType.Text)
                 {
-                    IToken data = CompleteToken(ref currentTokenText, ref currentTokenType);
-                    tokens.Add(data);
+                    currentTokenData = CompleteToken(ref currentTokenText, ref currentTokenType);
+                    tokens.Add(currentTokenData);
 
                     currentTokenType = TokenType.Undefined;
                     
@@ -292,6 +295,8 @@ public class Interpreter
         return tokens.ToArray();
     }
 
+    // Method called when the tokenisor has reached the end of a token and wants to parse it
+    // Code split off as it is used in multiple places in the tokenise method
     private IToken CompleteToken(ref string currentTokenText, ref TokenType currentTokenType)
     {
         IToken currentTokenData;
@@ -306,31 +311,29 @@ public class Interpreter
         return currentTokenData;
     }
 
+    // Method for parsing and evaluating user input
+    // Used to differentiate between two different types of input (calculation and commands)
     public IToken? Run()
     {
         IToken[] tokens = Tokenise();
 
+        // If the first token is a command, run that command
         if (tokens[0].Type == TokenType.Function && CommandNames.Contains(((Function)tokens[0]).Name))
         {
             Function command = (Function)tokens[0].CastTo(TokenType.Function);
-            IToken[] args = new IToken[tokens.Length - 1];
 
+            // Gets the remaining tokens and makes them a seperate array for the command's arguments
+            IToken[] args = new IToken[tokens.Length - 1];
             Array.Copy(tokens, 1, args, 0, tokens.Length - 1);
 
             return RunCommand(command, args);
         }
 
-        if (tokens[0].Type != TokenType.Text)
-        {
-            _Evaluator.Expression = tokens;
-            return _Evaluator.Evaluate();
-        }
-        else
-        {
-            return tokens[0];
-        }
+        _Evaluator.Expression = tokens;
+        return _Evaluator.Evaluate();
     }
 
+    // Code for parsing a user's input for a command and running it
     private IToken? RunCommand(Function command, IToken[] args)
     {
         switch (command.Name)
