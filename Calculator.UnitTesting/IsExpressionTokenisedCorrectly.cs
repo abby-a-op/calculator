@@ -215,7 +215,7 @@ public class IsExpressionTokenisedCorrectly
 
         IToken[] expected = new IToken[]
         {
-            new Function("addVec"),
+            new Command("addVec"),
             new Vec2(5, 3),
             new Vec2(6, 2)
         };

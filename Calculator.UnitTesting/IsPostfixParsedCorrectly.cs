@@ -82,4 +82,16 @@ public class IsPostFixParsedCorrectly
 
         Assert.AreEqual(8, result.Value);
     }
+
+    [TestMethod]
+    public void IsInvalidExpressionHandledCorrectly()
+    {
+        _Parser.Expression = new IToken[]
+        {
+            new Integer(2),
+            new Operator('/')
+        };
+
+        Assert.Throws<FormatException>(_Parser.Evaluate);
+    }
 }
