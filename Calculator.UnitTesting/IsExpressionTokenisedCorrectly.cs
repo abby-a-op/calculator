@@ -204,4 +204,22 @@ public class IsExpressionTokenisedCorrectly
 
         Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
     }
+
+    [TestMethod]
+    public void AreVariableCommandArgumentsTokenisedCorrectly()
+    {
+        _interpreter.Variables["a"] = new Vec2(5, 3);
+        _interpreter.Variables["b"] = new Vec2(6, 2);
+
+        _interpreter.Command = "addVec a b";
+
+        IToken[] expected = new IToken[]
+        {
+            new Function("addVec"),
+            new Vec2(5, 3),
+            new Vec2(6, 2)
+        };
+
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
+    }
 }
