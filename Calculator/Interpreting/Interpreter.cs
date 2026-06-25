@@ -29,6 +29,8 @@ public class Interpreter
         "detMat",
         "invMat",
         "help",
+        "quit",
+        "exit",
         "?"
     };
 
@@ -38,6 +40,8 @@ public class Interpreter
     Basic usage - Enter any basic mathematical expression to get the result.
 
     Commands:
+    quit/exit - Closes the program
+
     ------------Geometry and vectors-----------
     vec [name] ([real x], [real y]) - Creates a 2D vector and stores it under a
     addVec [vector a] [vector b] - Adds two 2D vectors together (equivilent to a+b)
@@ -118,8 +122,13 @@ public class Interpreter
             // Spaces between operators should be ignored
             if (c == ' ' || c == ',')
             {
+                // If the current token is text, add the character
+                if (currentTokenType == TokenType.Text)
+                {
+                    currentTokenText += c;
+                }
                 // If the current token is an operand, a space after means the token is complete and the next iteration should begin
-                if ((currentTokenType & TokenType.Operand) != TokenType.Undefined)
+                else if ((currentTokenType & TokenType.Operand) != TokenType.Undefined)
                 {
                     currentTokenData = CompleteToken(ref currentTokenText, ref currentTokenType);
                     tokens.Add(currentTokenData);
@@ -128,11 +137,6 @@ public class Interpreter
                     currentTokenType = TokenType.Undefined;
                 }
 
-                // If the current token is text, add the character
-                else if (currentTokenType == TokenType.Text)
-                {
-                    currentTokenText += c;
-                }
 
                 continue;
             }
@@ -148,6 +152,8 @@ public class Interpreter
                 {
                     IToken data = CompleteToken(ref currentTokenText, ref currentTokenType);
                     tokens.Add(data);
+
+                    currentTokenType = TokenType.Undefined;
                     
                     continue;
                 }
@@ -208,9 +214,12 @@ public class Interpreter
             }
         }
 
-        // Parses the last token
-        currentTokenData = CompleteToken(ref currentTokenText, ref currentTokenType);
-        tokens.Add(currentTokenData);
+        if (currentTokenType != TokenType.Undefined)
+        {
+            // Parses the last token
+            currentTokenData = CompleteToken(ref currentTokenText, ref currentTokenType);
+            tokens.Add(currentTokenData);
+        }    
 
         // Looks for a place where an implicit multiplication is happening and inserts a multiplication operator
         // e.g 2(2-3) becomes 2*(2-3)
@@ -292,7 +301,7 @@ public class Interpreter
         return currentTokenData;
     }
 
-    public IToken Run()
+    public IToken? Run()
     {
         IToken[] tokens = Tokenise();
 
@@ -317,7 +326,7 @@ public class Interpreter
         }
     }
 
-    private IToken RunCommand(Function command, IToken[] args)
+    private IToken? RunCommand(Function command, IToken[] args)
     {
         switch (command.Name)
         {
@@ -343,7 +352,7 @@ public class Interpreter
                     a = ((Integer)args[0].CastTo(TokenType.Integer)).Value;
                     b = ((Integer)args[1].CastTo(TokenType.Integer)).Value;
 
-                    Text plain = (Text)args[3].CastTo(TokenType.Text);
+                    Text plain = (Text)args[2].CastTo(TokenType.Text);
 
                     return Encryption.AffineEn(a, b, plain);
                 }
@@ -354,7 +363,7 @@ public class Interpreter
                     a = ((Integer)args[0].CastTo(TokenType.Integer)).Value;
                     b = ((Integer)args[1].CastTo(TokenType.Integer)).Value;
 
-                    Text plain = (Text)args[3].CastTo(TokenType.Text);
+                    Text plain = (Text)args[2].CastTo(TokenType.Text);
 
                     return Encryption.AffineDe(a, b, plain);
                 }
@@ -497,6 +506,11 @@ public class Interpreter
                     Matrix a = (Matrix)args[0].CastTo(TokenType.Matrix);
 
                     return a.Inv();
+                }
+            case "exit":
+            case "quit":
+                {
+                    return null;
                 }
             default:
                 {

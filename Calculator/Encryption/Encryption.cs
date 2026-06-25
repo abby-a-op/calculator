@@ -27,13 +27,13 @@ public static class Encryption
     {
         isUpper = false;
         
-        if (char.IsUpper(c))
+        if (UPPERCASE.Contains(c))
         {
             isUpper = true;
             return c - 'A';
         }
         
-        if (char.IsLower(c))
+        if (LOWERCASE.Contains(c))
         {
             return c - 'a';
         }
@@ -156,14 +156,21 @@ public static class Encryption
         {
             int n = GetLetterNumber(p, out bool isUpper);
 
-            int cipherIndex = a * n + b;
-            cipherIndex %= 26;
+            if (n == -1)
+            {
+                cipherText += p;
+            }
+            else
+            {
+                int cipherIndex = a * n + b;
+                cipherIndex %= 26;
 
-            if (cipherIndex < 0) cipherIndex += 26;
+                if (cipherIndex < 0) cipherIndex += 26;
             
-            char c = GetLetterFromNumber(cipherIndex, isUpper);
+                char c = GetLetterFromNumber(cipherIndex, isUpper);
 
-            cipherText += c;
+                cipherText += c;
+            }
         }
 
         return new Text(cipherText);
@@ -182,16 +189,24 @@ public static class Encryption
         foreach (char c in ciphertext)
         {
             int n = GetLetterNumber(c, out bool isUpper);
-            
-            int plainIndex = InvMod[a] * (n-b);
-            plainIndex %= 26;
 
-            if (plainIndex < 0) plainIndex += 26;
+            if (n == -1)
+            {
+                plaintext += c;
+            }
+            else
+            {
+                int plainIndex = InvMod[a] * (n - b);
+                plainIndex %= 26;
 
-            char p = GetLetterFromNumber(plainIndex, isUpper);
-            p = ModChar(p, 26, isUpper);
+                if (plainIndex < 0) plainIndex += 26;
 
-            plaintext += p;
+                char p = GetLetterFromNumber(plainIndex, isUpper);
+                p = ModChar(p, 26, isUpper);
+
+                plaintext += p;
+            }
+
         }
 
         return new Text(plaintext);
