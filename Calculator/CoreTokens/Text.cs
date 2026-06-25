@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace Calculator;
 
+// Class for text tokens, used for encryption module
 public struct Text: IToken
 {
     public string Value { get; set; }
@@ -15,14 +16,15 @@ public struct Text: IToken
 
     public string Output() => Value;
 
+    // Allows concatenation of strings
     public IToken ApplyOperation(IToken? rhs, OperatorType op)
     {
         if (rhs == null) throw new InvalidOperationException($"Operation {op} is invalid on text");
 
-        if (rhs.Type == TokenType.Text && op == OperatorType.Plus)
+        if (op == OperatorType.Plus)
         {
             string a = Value;
-            string b = ((Text)rhs).Value;
+            string b = ((Text)rhs.CastTo(TokenType.Text)).Value;
 
             return new Text(a+b);
         }
