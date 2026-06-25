@@ -7,20 +7,39 @@ public class Program
         Interpreter interpreter = new Interpreter();
         Console.WriteLine("Type ? or 'help' for a list of commands");
 
-        while (true)
+        bool continuing = true;
+
+        while (continuing)
         {
-            string input = Console.ReadLine() ?? "";
-            interpreter.Command = input;
+            string input = Console.ReadLine();
 
-            try
+            if (input != null)
             {
-                IToken result = interpreter.Run();
+                interpreter.Command = input;
 
-                Console.WriteLine(result.Output());
+                try
+                {
+                    IToken? result = interpreter.Run();
+
+                    if (result != null)
+                    {
+                        Console.WriteLine(result.Output());
+                    }
+                    else
+                    {
+                        continuing = false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                Console.WriteLine();
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e.Message);
+                continuing = false;
             }
         }
     }
