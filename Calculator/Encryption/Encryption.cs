@@ -106,7 +106,7 @@ public static class Encryption
             else
             {
                 int cIndex = n + 3;
-                cIndex %= 25;
+                cIndex %= 26;
 
                 c = GetLetterFromNumber(cIndex, isUpper);
             }
