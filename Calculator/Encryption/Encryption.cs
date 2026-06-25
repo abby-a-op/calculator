@@ -7,6 +7,7 @@ public static class Encryption
     const string LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
     const string UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+    // Table for modular inverses mod 26
     private static Dictionary<int, int> InvMod = new Dictionary<int, int>()
     {
         { 1, 1 },
@@ -23,6 +24,8 @@ public static class Encryption
         { 25, 25 }
     };
 
+    // Gives the alphabetical index of a number and whether it's upper or lowercase
+    // Used because the numeric value of chars is different to their alphabetical position
     public static int GetLetterNumber(char c, out bool isUpper)
     {
         isUpper = false;
@@ -41,6 +44,7 @@ public static class Encryption
         return -1;
     }
 
+    // Undoes the conversion from letter to number
     public static char GetLetterFromNumber(int n, bool isUpper)
     {
         if (isUpper)
@@ -53,26 +57,6 @@ public static class Encryption
         }
     }
 
-    private static char ModChar(char c, int divisor, bool uppercase)
-    {
-        if (uppercase)
-        {
-            while (!UPPERCASE.Contains(c))
-            {
-                c -= (char)divisor;
-            }
-        }
-        else
-        {
-            while (!LOWERCASE.Contains(c))
-            {
-                c -= (char)divisor;
-            }
-        }
-
-        return c;
-    }
-
     public static Text CaesarDe(Text input)
     {
         string plaintext = "";
@@ -81,21 +65,19 @@ public static class Encryption
         foreach (char c in cipherText)
         {
             char p;
-            if (LOWERCASE.Contains(c))
+            int n = GetLetterNumber(c, out bool isUpper);
+            if (n == -1)
             {
-                p = (char)(c - 3);
-
-                p = ModChar(p, 26, false);
-            }
-            else if (UPPERCASE.Contains(c))
-            {
-                p = (char)(c - 3);
-                
-                p = ModChar(p, 26, true);
+                p = c;
             }
             else
             {
-                p = c;
+                int pIndex = n - 3;
+                pIndex %= 26;
+
+                if (pIndex < 0) pIndex += 26;
+
+                p = GetLetterFromNumber(pIndex, isUpper);
             }
 
             plaintext += p;
@@ -112,27 +94,18 @@ public static class Encryption
         foreach (char p in plaintext)
         {
             char c;
-            if (LOWERCASE.Contains(p))
-            {
-                c = (char)(p + 3);
+            int n = GetLetterNumber(p, out bool isUpper);
 
-                // Adding a check then subtracting is easier to me than calculating the mod and then adding the ASCII offset, and achieves the same result
-                if (c > 'z')
-                {
-                    c -= 'a';
-                }
-            }
-            else if (UPPERCASE.Contains(p))
+            if (n == -1)
             {
-                c = (char)(p + 3);
-                if (c > 'Z')
-                {
-                    c -= 'A';
-                }
+                c = p;
             }
             else
             {
-                c = p;
+                int cIndex = n + 3;
+                cIndex %= 25;
+
+                c = GetLetterFromNumber(cIndex, isUpper);
             }
 
             cipherText += c;
@@ -202,7 +175,6 @@ public static class Encryption
                 if (plainIndex < 0) plainIndex += 26;
 
                 char p = GetLetterFromNumber(plainIndex, isUpper);
-                p = ModChar(p, 26, isUpper);
 
                 plaintext += p;
             }
