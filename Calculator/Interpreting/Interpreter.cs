@@ -28,6 +28,8 @@ public class Interpreter
         "scalMat",
         "detMat",
         "invMat",
+        "degToRad",
+        "radToDeg",
         "help",
         "quit",
         "exit",
@@ -43,6 +45,9 @@ public class Interpreter
     quit/exit - Closes the program
 
     ------------Geometry and vectors-----------
+    radToDeg [real theta] - Converts an angle in radians to degrees
+    degToRad [real theta] - Converts an angle in degrees to radians
+
     vec [name] ([real x], [real y]) - Creates a 2D vector and stores it under a
     addVec [vector a] [vector b] - Adds two 2D vectors together (equivilent to a+b)
     subVec [vector a] [vector b] - Subtracts two 2D vectors
@@ -506,6 +511,18 @@ public class Interpreter
                     Matrix a = (Matrix)args[0].CastTo(TokenType.Matrix);
 
                     return a.Inv();
+                }
+            case "degToRad":
+                {
+                    Real theta = (Real)args[0].CastTo(TokenType.Real);
+
+                    return Geometry.DegToRad(theta);
+                }
+            case "radToDeg":
+                {
+                    Real theta = (Real)args[0].CastTo(TokenType.Real);
+
+                    return Geometry.RadToDeg(theta);
                 }
             case "exit":
             case "quit":
