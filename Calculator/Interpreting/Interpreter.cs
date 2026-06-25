@@ -97,6 +97,7 @@ public class Interpreter
             TokenType.Text => new Text(tokenText),
             TokenType.Operator => new Operator(tokenText[0]),
             TokenType.Function => new Function(tokenText),
+            TokenType.Command => new Command(tokenText),
             TokenType.Real => new Real(double.Parse(tokenText)),
             TokenType.Variable => new Variable(tokenText, Variables),
             _ => throw new ArgumentException("Unable to create token of type " + tokenType)
@@ -110,6 +111,7 @@ public class Interpreter
     public IToken[] Tokenise()
     {
         List<IToken> tokens = new List<IToken>();
+
 
         // The text for the current token. Parsed when a new token starts
         string currentTokenText = "";
@@ -229,21 +231,25 @@ public class Interpreter
             tokens.Add(currentTokenData);
         }    
 
-        // Looks for a place where an implicit multiplication is happening and inserts a multiplication operator
-        // e.g 2(2-3) becomes 2*(2-3)
-        for (int i = 0; i < tokens.Count-1; i++)
-        {
-            if ((tokens[i].Type & TokenType.Operand) == TokenType.Undefined && (tokens[i].Type != TokenType.Operator ||
-                                                                              ((Operator)tokens[i]).Value !=
-                                                                              OperatorType.ClosingBracket))
+        // Inserts implicit multiplication sign unless in command mode
+        if (tokens[0].Type != TokenType.Command)
+        {            
+            // Looks for a place where an implicit multiplication is happening and inserts a multiplication operator
+            // e.g 2(2-3) becomes 2*(2-3)
+            for (int i = 0; i < tokens.Count-1; i++)
             {
-                continue;
-            }
-            if (tokens[i+1].Type == TokenType.Variable
-                || tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Name != "!"
-                || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket)
-            {
-                tokens.Insert(i + 1, new Operator(OperatorType.Multiply));
+                if ((tokens[i].Type & TokenType.Operand) == TokenType.Undefined && (tokens[i].Type != TokenType.Operator ||
+                                                                                ((Operator)tokens[i]).Value !=
+                                                                                OperatorType.ClosingBracket))
+                {
+                    continue;
+                }
+                if (tokens[i+1].Type == TokenType.Variable
+                    || tokens[i + 1].Type == TokenType.Function && ((Function)tokens[i + 1]).Name != "!"
+                    || tokens[i + 1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.OpeningBracket)
+                {
+                    tokens.Insert(i + 1, new Operator(OperatorType.Multiply));
+                }
             }
         }
         
@@ -285,7 +291,7 @@ public class Interpreter
             }
 
             // Do not substitute if you are reassigning the variable
-            if (tokens[i+1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.Equals)
+            if (i < tokens.Count - 1 && tokens[i+1].Type == TokenType.Operator && ((Operator)tokens[i+1]).Value == OperatorType.Equals)
             {
                 continue;
             }
@@ -307,9 +313,16 @@ public class Interpreter
     {
         IToken currentTokenData;
 
-        if (currentTokenType == TokenType.Variable && (Functions.FunctionNames.Contains(currentTokenText) || CommandNames.Contains(currentTokenText)))
-        {            
-            currentTokenType = TokenType.Function;
+        if (currentTokenType == TokenType.Variable)
+        {
+            if (Functions.FunctionNames.Contains(currentTokenText))
+            {
+                currentTokenType = TokenType.Function;
+            }
+            if (CommandNames.Contains(currentTokenText))
+            {
+                currentTokenType = TokenType.Command;
+            }
         }
         currentTokenData = ParseTokenText(currentTokenText, currentTokenType);
         currentTokenText = "";
@@ -324,9 +337,9 @@ public class Interpreter
         IToken[] tokens = Tokenise();
 
         // If the first token is a command, run that command
-        if (tokens[0].Type == TokenType.Function && CommandNames.Contains(((Function)tokens[0]).Name))
+        if (tokens[0].Type == TokenType.Command)
         {
-            Function command = (Function)tokens[0].CastTo(TokenType.Function);
+            Command command = (Command)tokens[0];
 
             // Gets the remaining tokens and makes them a seperate array for the command's arguments
             IToken[] args = new IToken[tokens.Length - 1];
@@ -340,7 +353,7 @@ public class Interpreter
     }
 
     // Code for parsing a user's input for a command and running it
-    private IToken? RunCommand(Function command, IToken[] args)
+    private IToken? RunCommand(Command command, IToken[] args)
     {
         switch (command.Name)
         {
@@ -414,8 +427,9 @@ public class Interpreter
                 {
                     Variable @var = (Variable)args[0];
 
-                    Real x = (Real)args[3].CastTo(TokenType.Real);
-                    Real y = (Real)args[4].CastTo(TokenType.Real);
+                    // args[1] is a bracket                    
+                    Real x = (Real)args[2].CastTo(TokenType.Real);
+                    Real y = (Real)args[3].CastTo(TokenType.Real);
 
                     Vec2 vec = new Vec2(x.Value, y.Value);
                     Variables[@var.Name] = vec;
@@ -454,10 +468,12 @@ public class Interpreter
                 {
                     Variable @var = (Variable)args[0];
 
-                    Real x1 = (Real)args[3].CastTo(TokenType.Real);
-                    Real y1 = (Real)args[4].CastTo(TokenType.Real);
-                    Real x2 = (Real)args[5].CastTo(TokenType.Real);
-                    Real y2 = (Real)args[6].CastTo(TokenType.Real);
+                    // args[1] is a bracket
+
+                    Real x1 = (Real)args[2].CastTo(TokenType.Real);
+                    Real y1 = (Real)args[3].CastTo(TokenType.Real);
+                    Real x2 = (Real)args[4].CastTo(TokenType.Real);
+                    Real y2 = (Real)args[5].CastTo(TokenType.Real);
 
                     Variables[@var.Name] = new Line(new Vec2(x1.Value, y1.Value), new Vec2(x2.Value, y2.Value));
 
@@ -479,10 +495,11 @@ public class Interpreter
                 {
                     Variable @var = (Variable)args[0];
 
-                    Real a = (Real)args[3].CastTo(TokenType.Real);
-                    Real b = (Real)args[4].CastTo(TokenType.Real);
-                    Real c = (Real)args[5].CastTo(TokenType.Real);
-                    Real d = (Real)args[6].CastTo(TokenType.Real);
+                    // args[1] is a bracket
+                    Real a = (Real)args[2].CastTo(TokenType.Real);
+                    Real b = (Real)args[3].CastTo(TokenType.Real);
+                    Real c = (Real)args[4].CastTo(TokenType.Real);
+                    Real d = (Real)args[5].CastTo(TokenType.Real);
 
                     Variables[@var.Name] = new Matrix(a.Value, b.Value, c.Value, d.Value);
 

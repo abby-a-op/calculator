@@ -34,5 +34,6 @@ public enum TokenType
     Vec2 = 64,
     Matrix = 128,
     Line = 256,
+    Command = 512,
     Operand = Integer | Real | Vec2 | Variable | Matrix | Text
 }
