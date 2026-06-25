@@ -3,6 +3,7 @@ namespace Calculator.UnitTesting;
 [TestClass]
 public class IsCheckDigitGeneratedCorrectly
 {
+    // These barcodes were taken at random from references I found online
     [TestMethod]
     // Sample UPC barcodes
     [DataRow("71234567890", "712345678904")]

@@ -1,5 +1,6 @@
 namespace Calculator.UnitTesting;
 
+// In most cases, this test cases were made to help trace issues that had appeared throughout development
 [TestClass]
 public class IsPostFixParsedCorrectly
 {

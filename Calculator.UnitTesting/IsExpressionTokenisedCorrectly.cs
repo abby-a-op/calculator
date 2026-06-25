@@ -1,5 +1,7 @@
 namespace Calculator.UnitTesting;
 
+
+// Unless otherwise stated, all test cases in this file are edge cases that caused issues at some point in development
 [TestClass]
 public class IsExpressionTokenisedCorrectly
 {
@@ -10,6 +12,7 @@ public class IsExpressionTokenisedCorrectly
         _interpreter = new Interpreter();
     }
 
+    // Helper method to check if the tokens are equal
     bool TokensEqual(IToken[] expected, IToken[] actual)
     {
         if (expected.Length != actual.Length)
@@ -39,7 +42,7 @@ public class IsExpressionTokenisedCorrectly
 
         return true;
     }
-
+    
     [TestMethod]
     public void IsFactorialParsedCorrectly()
     {
@@ -54,6 +57,7 @@ public class IsExpressionTokenisedCorrectly
         Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
     }
 
+    // Generic test for all operators, good for stress testing
     [TestMethod]
     public void AreAllOperatorsTokenisedCorrectly()
     {
@@ -218,6 +222,26 @@ public class IsExpressionTokenisedCorrectly
             new Command("addVec"),
             new Vec2(5, 3),
             new Vec2(6, 2)
+        };
+
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
+    }
+
+    // This is a feature I never implemented, which is a major limitation
+    // The test should ideally pass, but unfortunately will not
+    [TestMethod]
+    public void AreNegativeCommandArgumentsTokenisedCorrectly()
+    {
+        _interpreter.Command = "vec a (-2, 3)";
+
+        IToken[] expected = new IToken[]
+        {
+            new Command("vec"),
+            new Variable("a", _interpreter.Variables),
+            new Operator(OperatorType.OpeningBracket),
+            new Integer(-2),
+            new Integer(3),
+            new Operator(OperatorType.ClosingBracket)
         };
 
         Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));

@@ -1,5 +1,6 @@
 namespace Calculator.UnitTesting;
 
+// As with the tokenisation class, all test cases are the result of edge cases encountered while testing
 [TestClass]
 public class IsInfixParsedCorrectly
 {
@@ -9,6 +10,7 @@ public class IsInfixParsedCorrectly
         _parser = new InfixToPostfixParser();
     }
 
+    // Helper method to check if the expected output matches the actual
     bool ExpressionEqual(IToken[] expected, IToken[] actual)
     {
         if (expected.Length != actual.Length)

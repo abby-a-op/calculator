@@ -8,7 +8,7 @@ public class IsMatrixHandledCorrectly
 
     private static readonly Matrix Identity = new Matrix(1, 0, 0, 1);
 
-    // Asserts if two matrices are true to a small 
+    // Asserts if two matrices are true to a small margin of error (required due to floating point inpercision)
     bool MatrixEqual(Matrix a, Matrix b)
     {
         double delta = 0.0001;
@@ -22,6 +22,7 @@ public class IsMatrixHandledCorrectly
         return equals;
     }
     
+    // This case was chosen as it tests multiple operations: the determinate, inverse, and multiplication
     [TestMethod]
     public void IsMatrixInverseAndMultiplicationHandledCorrectly()
     {
@@ -31,7 +32,8 @@ public class IsMatrixHandledCorrectly
 
         Assert.IsTrue(MatrixEqual(Identity, m.Dot(inv)));
     }
-
+    
+    // Chosen as a basic test of multiplication
     [TestMethod]
     public void IsMultiplicationByIdentityCorrect()
     {
