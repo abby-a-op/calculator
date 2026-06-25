@@ -45,7 +45,17 @@ public class Interpreter
     dotVec [vector a] [vector b] - Calculates the dot product of two 2D vectors
     scalVec [real s] [vector a] - Scales a vector by scalar s
 
-    TODO: LINES AND MATRICES
+    Line [name] ([real x1], [real y1], [real x2], [real y2]) - Creates a line from (x1, y1) to (x2, y2)
+    lengthLine [line a] - Calculates the length of line a
+    midpointLine [line a] - Calculates the midpoint of line a
+    gradientLine [line a] - Calculates the slope of line a
+    
+    mat [name] ([real a], [real b], [real c], [real d]) - Creates a 2x2 matrix
+    addMat [matrix a] [matrix b] - Adds two matrices together
+    dotMat [matrix a] [matrix b] - Calculates the product of two matrices
+    scalMat [real s] [matrix a] - Scales a matrix by s
+    detMat [matrix a] - Calculates the determinate of a
+    invMat [matrix a] - Calculates the inverse of a matrix
 
     -------Number theory and encryption--------
     numRand [int a] [int X] [int c] [int m] - Generates a random number using the linear congruential method
@@ -97,6 +107,11 @@ public class Interpreter
 
         IToken currentTokenData;
 
+        if (string.IsNullOrEmpty(Command))
+        {
+            throw new FormatException("Input is empty");
+        }
+
         // Iterates through characters in the command
         foreach (var c in Command)
         {
@@ -131,7 +146,7 @@ public class Interpreter
             {
                 if (currentTokenType == TokenType.Text)
                 {
-                    IToken data = ParseTokenText(currentTokenText, currentTokenType);
+                    IToken data = CompleteToken(ref currentTokenText, ref currentTokenType);
                     tokens.Add(data);
                     
                     continue;
