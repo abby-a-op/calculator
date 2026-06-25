@@ -14,8 +14,8 @@ public class IsCheckDigitGeneratedCorrectly
     [DataRow("501234567890", "5012345678900")]
     public void IsDigitGeneratedCorrectly(string digits, string expectedString)
     {
-        string actualString = NumberTheory.NumCheckDigit(digits);
+        Text actualString = NumberTheory.NumCheckDigit(new Text(digits));
 
-        Assert.AreEqual(expectedString, actualString);
+        Assert.AreEqual(expectedString, actualString.Value);
     }
 }

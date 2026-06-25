@@ -177,6 +177,19 @@ public class IsExpressionTokenisedCorrectly
     }
 
     [TestMethod]
+    public void IsTextTokenisedCorrectly()
+    {
+        _interpreter.Command = "\"Hello World\"";
+
+        IToken[] expected = new IToken[]
+        {
+            new Text("Hello World")
+        };
+
+        Assert.IsTrue(TokensEqual(expected, _interpreter.Tokenise()));
+    }
+
+    [TestMethod]
     public void IsNegativeDenominatorTokenisedCorrectly()
     {
         _interpreter.Command = "2/-3";
